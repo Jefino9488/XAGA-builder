@@ -4,14 +4,12 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      URL:
+        description: official recovery
+        required: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -22,16 +20,35 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: maximizeYourBuildEnvironment
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 8192
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+      - name: CheckOutWarehouseFiles
+        uses: actions/checkout@main
+      - name: prepareTheRequiredEnvironment
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-      
+          echo "device=xaga" >> $GITHUB_ENV
+          sudo apt-get install python3 aria2 p7zip-full zstd
+      - name: Build ROM
+        run: |
+          sudo bash "$GITHUB_WORKSPACE"/build.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: fastboot ROM
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
+          cp "$GITHUB_WORKSPACE/${device}_package.zip" "$GITHUB_WORKSPACE/GithubRelease/"
+
+      - name: 上传到 Github Release
+        uses: ncipollo/release-action@main
+        with:
+          artifacts: ${{ github.workspace }}/GithubRelease/*
+          name: "${{ env.CI }}"
+          tag: "${{ env.CI }}"
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
