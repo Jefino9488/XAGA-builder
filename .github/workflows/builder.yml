@@ -32,6 +32,7 @@ jobs:
       - name: prepareTheRequiredEnvironment
         run: |
           echo "device=xaga" >> $GITHUB_ENV
+          echo "date=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
           sudo apt-get install python3 aria2 p7zip-full zstd
       - name: Build ROM
         run: |
@@ -46,8 +47,8 @@ jobs:
         uses: ncipollo/release-action@main
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
-          name: "${{ env.GITHUB_ACTION }}"
-          tag: "${{ env.device }}"
+          name: "${{ env.date }}"
+          tag: "${{ env.date }}"
           allowUpdates: true
           artifactErrorsFailBuild: true
           token: ${{ secrets.GITHUB_TOKEN }}
