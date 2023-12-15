@@ -95,12 +95,14 @@ done
 # Run lpmake command with dynamic sizes
 Start_Time
 "$GITHUB_WORKSPACE"/tools/lpmake \
-  --metadata-size 65536 --super-name super --block-size 4096 \
+  --device-size 9840000000 \
+  --metadata-size 65536 \
+  --block-size 4096 \
   $partition_sizes \
   --device super \
   --metadata-slots 3 --group qti_dynamic_partitions_a --group qti_dynamic_partitions_b \
   --virtual-ab -F \
-  --output "$GITHUB_WORKSPACE/images/super.img"
+  --output "$GITHUB_WORKSPACE/super_maker/super.img"
 
 for i in mi_ext odm product system system_ext vendor vendor_dlkm; do
   rm -rf "$GITHUB_WORKSPACE/super_maker/$i.img"
