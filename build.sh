@@ -70,7 +70,7 @@ done
 image_directory="$GITHUB_WORKSPACE/super_maker"
 
 # Define the list of image files
-image_files=("mi_ext.img" "odm.img" "product.img" "system.img" "system_ext.img" "vendor.img" "vendor_dlkm.img")
+image_files=("mi_ext.img" "odm.img" "product.img" "system.img" "system_ext.img" "vendor.img" )
 
 # Initialize variables for total size and partition sizes
 total_size=0
@@ -107,7 +107,7 @@ done
   --output "$GITHUB_WORKSPACE/super_maker/super.img"
 End_Time Pack super
 
-for i in mi_ext odm product system system_ext vendor vendor_dlkm; do
+for i in mi_ext odm product system system_ext vendor ; do
   rm -rf "$GITHUB_WORKSPACE/super_maker/$i.img"
 done
 
