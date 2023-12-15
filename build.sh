@@ -98,7 +98,7 @@ for image_file in "${image_files[@]}"; do
 done
 
 # Run lpmake command with dynamic sizes
-lpmake \
+"$GITHUB_WORKSPACE"/tools/lpmake \
   $partition_sizes \
   --device super:${total_size} \
   --metadata-slots 3 --group qti_dynamic_partitions_a:${total_size} --group qti_dynamic_partitions_b:${total_size} \
