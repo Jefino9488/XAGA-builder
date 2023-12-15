@@ -42,8 +42,9 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
           cp "$GITHUB_WORKSPACE/${device}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/"
+          cd "$GITHUB_WORKSPACE"
 
-      - name: 上传到 Github Release
+      - name: Github Release
         uses: ncipollo/release-action@main
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
