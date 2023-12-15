@@ -100,6 +100,7 @@ done
 # Run lpmake command with dynamic sizes
 "$GITHUB_WORKSPACE"/tools/lpmake \
   $partition_sizes \
+  --metadata-size 65536 --super-name super --block-size 4096 \
   --device super:${total_size} \
   --metadata-slots 3 --group qti_dynamic_partitions_a:${total_size} --group qti_dynamic_partitions_b:${total_size} \
   --virtual-ab -F \
