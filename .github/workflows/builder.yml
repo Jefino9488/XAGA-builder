@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Fastboot Builder
 
 # Controls when the workflow will run
 on:
@@ -46,8 +46,8 @@ jobs:
         uses: ncipollo/release-action@main
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
-          name: "${{ env.CI }}"
-          tag: "${{ env.CI }}"
+          name: "${{ env.GITHUB_ACTION }}"
+          tag: "${{ env.device }}"
           allowUpdates: true
           artifactErrorsFailBuild: true
           token: ${{ secrets.GITHUB_TOKEN }}
