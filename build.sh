@@ -95,9 +95,7 @@ done
 # Run lpmake command with dynamic sizes
 Start_Time
 "$GITHUB_WORKSPACE"/tools/lpmake \
-  --device-size 9840000000 \
-  --metadata-size 65536 \
-  --block-size 4096 \
+  --metadata-size 65536 --super-name super --block-size 4096 \
   $partition_sizes \
   --device super \
   --metadata-slots 3 --group qti_dynamic_partitions_a --group qti_dynamic_partitions_b \
