@@ -66,7 +66,7 @@ sudo rm -rf "$GITHUB_WORKSPACE"/"${device}"/payload.bin
 End_Time
 
 for i in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
-    mv "$GITHUB_WORKSPACE/${device}/$i.img" "$GITHUB_WORKSPACE/super_maker/"
+    mv "$GITHUB_WORKSPACE/${device}/images/$i.img" "$GITHUB_WORKSPACE/super_maker/"
 done
 
 for i in mi_ext odm product system system_ext vendor vendor_dlkm; do
