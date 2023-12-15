@@ -67,7 +67,7 @@ for i in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
     mv "$GITHUB_WORKSPACE/${device}/images/$i.img" "$GITHUB_WORKSPACE/super_maker/"
 done
 # Define the path to the directory containing the image files
-image_directory="$GITHUB_WORKSPACE/images"
+image_directory="$GITHUB_WORKSPACE/super_maker/"
 
 # Define the list of image files
 image_files=("mi_ext.img" "odm.img" "product.img" "system.img" "system_ext.img" "vendor.img" "vendor_dlkm.img")
