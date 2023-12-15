@@ -87,7 +87,7 @@ for image_file in "${image_files[@]}"; do
         image_size=$(du -b "$image_path" | cut -f1)
 
         # Add the size to the total
-        total_size=$((total_size + image_size))
+        total_size=$((total_size + image_size + 1000))
 
         # Append the partition configuration to the command
         partition_sizes+="--partition ${image_file%.*}_a:readonly:${image_size}:qti_dynamic_partitions_a --image ${image_file%.*}_a=${image_path} "
