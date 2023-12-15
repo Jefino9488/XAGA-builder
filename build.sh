@@ -2,6 +2,7 @@
 
 URL="$1"
 GITHUB_WORKSPACE="$2"
+
 device=xaga
 
 Start_Time() {
@@ -9,6 +10,7 @@ Start_Time() {
 }
 
 End_Time() {
+  # Hours, minutes, seconds, milliseconds, nanoseconds
   local h min s ms ns end_ns time
   End_ns=$(date +'%s%N')
   time=$(expr $End_ns - $Start_ns)
@@ -43,51 +45,67 @@ End_Time() {
 ### System package download
 echo -e "\e[1;31m - Start downloading package \e[0m"
 Start_Time
-aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" -o "recovery_rom.zip" "${URL}"
+curl -o "$GITHUB_WORKSPACE/recovery_rom.zip" "$URL"
 End_Time Downloaded recovery rom
 
 Start_Time
-sudo chmod -R 777 "$GITHUB_WORKSPACE"/tools
-mkdir -p "$GITHUB_WORKSPACE"/"${device}"
-mkdir -p "$GITHUB_WORKSPACE"/super_maker/config
-mkdir -p "$GITHUB_WORKSPACE"/zip
+sudo chmod -R 777 "$GITHUB_WORKSPACE/tools"
+mkdir -p "$GITHUB_WORKSPACE/${device}"
+mkdir -p "$GITHUB_WORKSPACE/super_maker/config"
+mkdir -p "$GITHUB_WORKSPACE/zip"
 
 RECOVERY_ZIP="recovery_rom.zip"
-7z x "$GITHUB_WORKSPACE"/${RECOVERY_ZIP} -o"$GITHUB_WORKSPACE"/"${device}" payload.bin
+7z x "$GITHUB_WORKSPACE/$RECOVERY_ZIP" -o"$GITHUB_WORKSPACE/${device}" payload.bin
 rm -rf "${GITHUB_WORKSPACE:?}/$RECOVERY_ZIP"
 
 ### in xaga folder
-mkdir -p "$GITHUB_WORKSPACE"/"${device}"/images
-"$GITHUB_WORKSPACE"/tools/payload-dumper-go -o "$GITHUB_WORKSPACE"/"${device}"/images "$GITHUB_WORKSPACE"/"${device}"/payload.bin >/dev/null
-sudo rm -rf "$GITHUB_WORKSPACE"/"${device}"/payload.bin
+mkdir -p "$GITHUB_WORKSPACE/${device}/images"
+"$GITHUB_WORKSPACE/tools/payload-dumper-go" -o "$GITHUB_WORKSPACE/${device}/images" "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
+sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
 End_Time
 
-for i in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
-    mv "$GITHUB_WORKSPACE/${device}/images/$i.img" "$GITHUB_WORKSPACE/super_maker/"
+# Define the path to the directory containing the image files
+image_directory="$GITHUB_WORKSPACE/super_maker"
+
+# Define the list of image files
+image_files=("mi_ext.img" "odm.img" "product.img" "system.img" "system_ext.img" "vendor.img" "vendor_dlkm.img")
+
+# Initialize variables for total size and partition sizes
+total_size=0
+partition_sizes=""
+
+# Loop through the list of image files
+for image_file in "${image_files[@]}"; do
+    # Get the full path to the image file
+    image_path="$image_directory/$image_file"
+
+    # Check if the file exists
+    if [ -e "$image_path" ]; then
+        # Get the size of the image file
+        image_size=$(du -b "$image_path" | cut -f1)
+
+        # Add the size to the total
+        total_size=$((total_size + image_size))
+
+        # Append the partition configuration to the command
+        partition_sizes+="--partition ${image_file%.*}_a:readonly:${image_size}:qti_dynamic_partitions_a --image ${image_file%.*}_a=${image_path} "
+        partition_sizes+="--partition ${image_file%.*}_b:readonly:0:qti_dynamic_partitions_b "
+    else
+        echo "File not found: $image_path"
+    fi
 done
 
-Start_Time
-"$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --block-size 4096 \
-  --partition mi_ext_a:readonly:"$mi_ext_size":qti_dynamic_partitions_a --image mi_ext_a="$GITHUB_WORKSPACE"/super_maker/mi_ext.img \
-  --partition mi_ext_b:readonly:0:qti_dynamic_partitions_b \
-  --partition odm_a:readonly:"$odm_size":qti_dynamic_partitions_a --image odm_a="$GITHUB_WORKSPACE"/super_maker/odm.img \
-  --partition odm_b:readonly:0:qti_dynamic_partitions_b \
-  --partition product_a:readonly:"$product_size":qti_dynamic_partitions_a --image product_a="$GITHUB_WORKSPACE"/super_maker/product.img \
-  --partition product_b:readonly:0:qti_dynamic_partitions_b \
-  --partition system_a:readonly:"$system_size":qti_dynamic_partitions_a --image system_a="$GITHUB_WORKSPACE"/super_maker/system.img \
-  --partition system_b:readonly:0:qti_dynamic_partitions_b \
-  --partition system_ext_a:readonly:"$system_ext_size":qti_dynamic_partitions_a --image system_ext_a="$GITHUB_WORKSPACE"/super_maker/system_ext.img \
-  --partition system_ext_b:readonly:0:qti_dynamic_partitions_b \
-  --partition vendor_a:readonly:"$vendor_size":qti_dynamic_partitions_a --image vendor_a="$GITHUB_WORKSPACE"/super_maker/vendor.img \
-  --partition vendor_b:readonly:0:qti_dynamic_partitions_b \
-  --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":qti_dynamic_partitions_a --image vendor_dlkm_a="$GITHUB_WORKSPACE"/super_maker/vendor_dlkm.img \
-  --partition vendor_dlkm_b:readonly:0:qti_dynamic_partitions_b \
-  --device super:9663676416 --metadata-slots 3 --group qti_dynamic_partitions_a:9663676416 --group qti_dynamic_partitions_b:9663676416 --virtual-ab -F \
-  --output "$GITHUB_WORKSPACE"/super_maker/super.img
+# Run lpmake command with dynamic sizes
+lpmake \
+  $partition_sizes \
+  --device super:${total_size} \
+  --metadata-slots 3 --group qti_dynamic_partitions_a:${total_size} --group qti_dynamic_partitions_b:${total_size} \
+  --virtual-ab -F \
+  --output "$GITHUB_WORKSPACE/super_maker/super.img"
 End_Time Pack super
 
 for i in mi_ext odm product system system_ext vendor vendor_dlkm; do
-  rm -rf "$GITHUB_WORKSPACE"/super_maker/$i.img
+  rm -rf "$GITHUB_WORKSPACE/super_maker/$i.img"
 done
 
 mv "$GITHUB_WORKSPACE/super_maker/super.img" "$GITHUB_WORKSPACE/${device}/images/"
@@ -97,7 +115,9 @@ mkdir -p "$GITHUB_WORKSPACE/${device}/boot"
 mkdir -p "$GITHUB_WORKSPACE/${device}/twrp"
 
 mv "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
+
 mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${device}/twrp/"
+
 mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
 
 cd "$GITHUB_WORKSPACE" || exit
