@@ -46,7 +46,7 @@ End_Time() {
 ### System package download
 echo -e "\e[1;31m - Start downloading package \e[0m"
 Start_Time
-wget --limit-rate=20m -O "$GITHUB_WORKSPACE/recovery_rom.zip" "${URL}"
+aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" -o "recovery_rom.zip" "${URL}"
 End_Time Downloaded recovery rom
 
 Start_Time
