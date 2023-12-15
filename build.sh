@@ -61,7 +61,7 @@ rm -rf "${GITHUB_WORKSPACE:?}/$RECOVERY_ZIP"
 
 ### in xaga folder
 mkdir -p "$GITHUB_WORKSPACE"/"${device}"/images
-"$GITHUB_WORKSPACE"/tools/payload -o "$GITHUB_WORKSPACE"/"${device}"/images "$GITHUB_WORKSPACE"/"${device}"/payload.bin >/dev/null
+"$GITHUB_WORKSPACE"/tools/payload-dumper-go -o "$GITHUB_WORKSPACE"/"${device}"/images "$GITHUB_WORKSPACE"/"${device}"/payload.bin >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE"/"${device}"/payload.bin
 End_Time
 
