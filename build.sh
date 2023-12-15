@@ -63,7 +63,9 @@ mkdir -p "$GITHUB_WORKSPACE/${device}/images"
 "$GITHUB_WORKSPACE/tools/payload-dumper-go" -o "$GITHUB_WORKSPACE/${device}/images" "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
 End_Time
-
+for i in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
+    mv "$GITHUB_WORKSPACE/${device}/images/$i.img" "$GITHUB_WORKSPACE/super_maker/"
+done
 # Define the path to the directory containing the image files
 image_directory="$GITHUB_WORKSPACE/super_maker"
 
@@ -123,3 +125,4 @@ mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
 cd "$GITHUB_WORKSPACE" || exit
 
 zip -r "${device}_fastboot.zip" "${device}"
+echo "Created ${device}_fastboot.zip"
