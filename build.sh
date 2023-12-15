@@ -121,4 +121,5 @@ mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${dev
 mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
 
 cd "$GITHUB_WORKSPACE" || exit
+
 zip -r "${device}_fastboot.zip" "${device}"
