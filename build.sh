@@ -67,13 +67,11 @@ for i in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
     mv "$GITHUB_WORKSPACE/${device}/images/$i.img" "$GITHUB_WORKSPACE/super_maker/"
 done
 # Define the path to the directory containing the image files
-image_directory="$GITHUB_WORKSPACE/super_maker"
+image_directory="$GITHUB_WORKSPACE/images"
 
 # Define the list of image files
-image_files=("mi_ext.img" "odm.img" "product.img" "system.img" "system_ext.img" "vendor.img" )
+image_files=("mi_ext.img" "odm.img" "product.img" "system.img" "system_ext.img" "vendor.img" "vendor_dlkm.img")
 
-# Initialize variables for total size and partition sizes
-total_size=0
 partition_sizes=""
 
 # Loop through the list of image files
@@ -84,10 +82,7 @@ for image_file in "${image_files[@]}"; do
     # Check if the file exists
     if [ -e "$image_path" ]; then
         # Get the size of the image file
-        image_size=$(du -b "$image_path" | cut -f1)
-
-        # Add the size to the total
-        total_size=$((total_size + image_size + 1000))
+        image_size=$(du -b "$image_path" | awk '{print $1}')
 
         # Append the partition configuration to the command
         partition_sizes+="--partition ${image_file%.*}_a:readonly:${image_size}:qti_dynamic_partitions_a --image ${image_file%.*}_a=${image_path} "
@@ -98,16 +93,16 @@ for image_file in "${image_files[@]}"; do
 done
 
 # Run lpmake command with dynamic sizes
+Start_Time
 "$GITHUB_WORKSPACE"/tools/lpmake \
-  $partition_sizes \
   --metadata-size 65536 --super-name super --block-size 4096 \
-  --device super:${total_size} \
-  --metadata-slots 3 --group qti_dynamic_partitions_a:${total_size} --group qti_dynamic_partitions_b:${total_size} \
+  $partition_sizes \
+  --device super \
+  --metadata-slots 3 --group qti_dynamic_partitions_a --group qti_dynamic_partitions_b \
   --virtual-ab -F \
-  --output "$GITHUB_WORKSPACE/super_maker/super.img"
-End_Time Pack super
+  --output "$GITHUB_WORKSPACE/images/super.img"
 
-for i in mi_ext odm product system system_ext vendor ; do
+for i in mi_ext odm product system system_ext vendor vendor_dlkm; do
   rm -rf "$GITHUB_WORKSPACE/super_maker/$i.img"
 done
 
