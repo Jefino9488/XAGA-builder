@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: maximizeYourBuildEnvironment
@@ -33,14 +35,22 @@ jobs:
         run: |
           sudo bash "$GITHUB_WORKSPACE"/build.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE
 
-      - name: Create and Upload Release
+      - name: ROM
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
+          cd "$GITHUB_WORKSPACE"/GithubRelease
+          sudo split -b 1536M -d "$GITHUB_WORKSPACE"/zip/"${{ env.device }}_fastboot.zip" "${{ env.device }}_${{ env.version }}.zip"
+          cd "$GITHUB_WORKSPACE"
+
+      - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "$GITHUB_WORKSPACE/zip/${{ env.device }}_folder.zip"
-          name: "${{ env.version }}"
+          artifacts: "$GITHUB_WORKSPACE/GithubRelease/*"
+          name: "${{ env.device }}"
           tag: "${{ env.version }}"
           allowUpdates: true
           artifactErrorsFailBuild: true
+          body: "recunstruct"
           token: ${{ secrets.GITHUB_TOKEN }}
 
 
