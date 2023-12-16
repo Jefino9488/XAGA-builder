@@ -54,8 +54,21 @@ jobs:
           split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_${{ env.version }}_fastboot-split.zip"
           cd "$GITHUB_WORKSPACE"
           touch file.log
-          echo -e "Fastboot version: ${{ env.version }}\n" > file.log
-      
+          echo -e "# ${device}_fastboot.zip\n" >> file.log
+          echo -e "## Fastboot version: ${{ env.version }}" > file.log
+          echo -e "This archive contains the Fastboot images for the device ${device}.\n" >> file.log
+          echo -e "## Contents\n" >> file.log
+          echo "- **images/**: Contains partition images." >> file.log
+          echo "- **boot/**: Includes the boot image." >> file.log
+          echo "- **twrp/**: Holds the TWRP image." >> file.log
+          echo "- **flasher.exe**: Flasher tool for the device." >> file.log
+          echo -e "\n## Flashing Instructions\n" >> file.log
+          echo "1. Download all splits and run the `merge.bat` to merge." >> file.log
+          echo "2. Extract the contents of merged archive to a convenient location." >> file.log
+          echo "3. Follow the flashing instructions provided by the flasher.exe." >> file.log
+          echo -e "\n## Notes\n" >> file.log
+          echo "- Ensure that you have the necessary tools and drivers installed before proceeding with the flashing process." >> file.log
+          echo -e "\nFor more details, refer to the device's official documentation.\n" >> file.log
 
       - name: Create and Upload Release
         uses: ncipollo/release-action@v1
