@@ -2,8 +2,9 @@
 
 URL="$1"
 GITHUB_WORKSPACE="$2"
+device_name="$3"
 
-device=xaga
+device=$device_name
 
 Start_Time() {
   Start_ns=$(date +'%s%N')
@@ -89,6 +90,6 @@ mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${dev
 
 mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
 
-zip -r "$GITHUB_WORKSPACE/zip/${device}_fastboot.zip" "$GITHUB_WORKSPACE/${device}"
+zip -r "$GITHUB_WORKSPACE/zip/${device}_fastboot.zip" -j "$GITHUB_WORKSPACE/${device}"/*
 
 echo "Created ${device}_fastboot.zip"

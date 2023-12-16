@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       URL:
-        description: official recovery
+        description: official recovery rom
         required: true
 
 jobs:
@@ -33,25 +33,36 @@ jobs:
 
       - name: prepareTheRequiredEnvironment
         run: |
-          echo "device=xaga" >> $GITHUB_ENV
+          # Extract device name from the URL
+          URL="${{ github.event.inputs.URL }}"
+          device_name=$(basename "$URL" | cut -d'_' -f2 | cut -d'.' -f2)
+          echo "device=$device_name" >> $GITHUB_ENV
+          echo "Device name: $device_name"
+
           echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
           sudo apt-get install python3 aria2 p7zip-full zstd
 
       - name: Build ROM
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/build.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/build.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE $device_name
 
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
           cd "$GITHUB_WORKSPACE"/GithubRelease
-          sudo split -b 1536M -d "$GITHUB_WORKSPACE"/zip/"${{ env.device }}_fastboot.zip" "${{ env.device }}_${{ env.version }}.zip"
+          cp "$GITHUB_WORKSPACE/tools/merge.bat" .
+          sudo split -b 1536M -d "$GITHUB_WORKSPACE"/zip/"${{ env.device }}_fastboot.zip" "${{ env.device }}_${{ env.version }}_fastboot-split.zip"
+          cd "$GITHUB_WORKSPACE"
+          touch file.log
+          echo -e "Fastboot version : ${{ env.version }}\n  > file.log
+
       - name: Create and Upload Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
-          name: "${{ env.version }}"
-          tag: "${{ env.version }}"
+          name: "${{ env.device }}_${{ env.version }}_fastboot"
+          tag: "${{ env.device }}_${{ env.version }}"
           artifactErrorsFailBuild: true
           allowUpdates: true
+          bodyFile: "${{ github.workspace }}/file.log"
           token: ${{ secrets.GITHUB_TOKEN }}
