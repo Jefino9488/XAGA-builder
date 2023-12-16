@@ -41,24 +41,10 @@ jobs:
         run: |
           sudo bash "$GITHUB_WORKSPACE"/build.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE
 
-      - name: Configure Git LFS
-        run: |
-          git lfs install
-          git lfs track "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip"
-          git add .gitattributes
-          git commit -m "Enable Git LFS for large files"
-          git push origin main
-
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
           cp "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/"
-
-          git lfs fetch origin main
-          git lfs push origin main
-
-          cd "$GITHUB_WORKSPACE/GithubRelease"
-          ls -lh  # Print file sizes for verification
 
       - name: Create and Upload Release
         uses: ncipollo/release-action@v1
@@ -66,6 +52,5 @@ jobs:
           artifacts: "$GITHUB_WORKSPACE/GithubRelease/${{ env.device }}_fastboot.zip"
           name: "${{ env.version }}"
           tag: "${{ env.version }}"
-          allowUpdates: true
           artifactErrorsFailBuild: true
           token: ${{ secrets.GITHUB_TOKEN }}
