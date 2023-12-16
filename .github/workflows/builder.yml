@@ -25,6 +25,12 @@ jobs:
       - name: CheckOutWarehouseFiles
         uses: actions/checkout@main
 
+      - name: Set Git user info
+        run: |
+          git config user.email "ajefinojacob9488@gmail.com"
+          git config user.name "Jefino9488"
+        shell: bash
+
       - name: prepareTheRequiredEnvironment
         run: |
           echo "device=xaga" >> $GITHUB_ENV
