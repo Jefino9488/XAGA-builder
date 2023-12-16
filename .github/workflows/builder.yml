@@ -35,22 +35,21 @@ jobs:
         run: |
           sudo bash "$GITHUB_WORKSPACE"/build.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE
 
-      - name: ROM
+      - name: Configure Git LFS
         run: |
-          mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
-          cd "$GITHUB_WORKSPACE"/GithubRelease
-          sudo split -b 1536M -d "$GITHUB_WORKSPACE"/zip/"${{ env.device }}_fastboot.zip" "${{ env.device }}_${{ env.version }}.zip"
-          cd "$GITHUB_WORKSPACE"
+          git lfs install
+          git lfs track "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip"
+          git add .gitattributes
+          git commit -m "Enable Git LFS for large files"
+          git push origin main
 
       - name: Upload Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "$GITHUB_WORKSPACE/GithubRelease/*"
-          name: "${{ env.device }}"
-          tag: "${{ env.version }}"
-          allowUpdates: true
-          artifactErrorsFailBuild: true
-          body: "recunstruct"
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
+          cp "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/"
 
+          git lfs fetch --all
+          git lfs push --all
 
+          cd "$GITHUB_WORKSPACE/GithubRelease"
+          ls -lh  # Print file sizes for verification
