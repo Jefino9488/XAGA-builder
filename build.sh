@@ -3,9 +3,9 @@
 URL="$1"
 GITHUB_WORKSPACE="$2"
 device_name="$3"
-echh device_name
+echo $device_name
 device=$device_name
-echo device
+echo $device
 Start_Time() {
   Start_ns=$(date +'%s%N')
 }
