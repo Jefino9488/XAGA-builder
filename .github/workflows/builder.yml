@@ -44,13 +44,14 @@ jobs:
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
-          cp "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/"
-
+          cd "$GITHUB_WORKSPACE"/GithubRelease
+          sudo split -b 1536M -d "$GITHUB_WORKSPACE"/zip/"${{ env.device }}_fastboot.zip" "${{ env.device }}_${{ env.version }}.zip"
       - name: Create and Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "$GITHUB_WORKSPACE/GithubRelease/${{ env.device }}_fastboot.zip"
+          artifacts: ${{ github.workspace }}/GithubRelease/*
           name: "${{ env.version }}"
           tag: "${{ env.version }}"
           artifactErrorsFailBuild: true
+          allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
