@@ -54,8 +54,18 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
           cp "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/"
 
-          git lfs fetch --all
-          git lfs push --all
+          git lfs fetch origin main
+          git lfs push origin main
 
           cd "$GITHUB_WORKSPACE/GithubRelease"
           ls -lh  # Print file sizes for verification
+
+      - name: Create and Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "$GITHUB_WORKSPACE/GithubRelease/${{ env.device }}_fastboot.zip"
+          name: "${{ env.version }}"
+          tag: "${{ env.version }}"
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          token: ${{ secrets.GITHUB_TOKEN }}
