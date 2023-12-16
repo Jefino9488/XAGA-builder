@@ -1,4 +1,3 @@
-#!/bin/bash
 
 URL="$1"
 GITHUB_WORKSPACE="$2"
