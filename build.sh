@@ -30,7 +30,7 @@ End_Time() {
     ms=$(expr $ns / 1000000)
     min=$(expr $s / 60)
     s=$(expr $s % 60)
-    echo -e "\e[1;34m - This time $1 takes: $min minutes $s seconds $ms milliseconds \e[0m"
+    echo -e "\e[1;34m - This time $1 took: $min minutes $s seconds $ms milliseconds \e[0m"
   elif [[ -n $s ]]; then
     ms=$(expr $ns / 1000000)
     echo -e "\e[1;34m - This time $1 took: $s seconds $ms milliseconds \e[0m"
