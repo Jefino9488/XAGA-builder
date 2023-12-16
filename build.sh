@@ -81,6 +81,7 @@ echo moved super
 
 mkdir -p "$GITHUB_WORKSPACE/${device}/boot"
 mkdir -p "$GITHUB_WORKSPACE/${device}/twrp"
+mkdir -p "$GITHUB_WORKSPACE/zip"
 
 mv "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
 
@@ -88,7 +89,6 @@ mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${dev
 
 mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
 
-cd "$GITHUB_WORKSPACE" || exit
+zip -r "$GITHUB_WORKSPACE/zip/${device}_folder.zip" "$GITHUB_WORKSPACE/${device}"
 
-zip -r "${device}_fastboot.zip" "${device}"
-echo "Created ${device}_fastboot.zip"
+echo "Created ${device}_folder.zip"
