@@ -78,6 +78,6 @@ jobs:
           tag: "${{ env.device }}_${{ env.version }}"
           artifactErrorsFailBuild: true
           allowUpdates: true
-          makeLatest: "legacy"
+          makeLatest: true
           bodyFile: "${{ github.workspace }}/file.log"
           token: ${{ secrets.GITHUB_TOKEN }}
