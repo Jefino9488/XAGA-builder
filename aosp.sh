@@ -106,7 +106,7 @@ total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_s
     --partition odm_dlkm_a:readonly:"$odm_dlkm_size":main --image odm_dlkm_a=./super_maker/odm_dlkm.img \
     --partition odm_a:readonly:"$odm_size":main --image odm_a=./super_maker/odm.img \
     --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":main --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
-    --sparse --output ./super.new.img
+    --sparse --output "$GITHUB_WORKSPACE"/super_maker/super.img
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to create super image."
