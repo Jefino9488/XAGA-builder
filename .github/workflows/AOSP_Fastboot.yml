@@ -48,6 +48,10 @@ jobs:
       - name: Build ROM
         run: |
           sudo bash "$GITHUB_WORKSPACE"/aosp.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }}
+          if [ $? -ne 0 ]; then
+            echo "Error: Build failed. Exiting workflow."
+            exit 1
+          fi
 
       - name: Upload Release
         run: |
