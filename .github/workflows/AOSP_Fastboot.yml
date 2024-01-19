@@ -1,1 +1,86 @@
+name: AOSP Fastboot Builder
 
+on:
+  workflow_dispatch:
+    inputs:
+      URL:
+        description: official recovery rom
+        required: true
+      Name:
+        description: enter device name
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: maximizeYourBuildEnvironment
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 8192
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+
+      - name: CheckOutWarehouseFiles
+        uses: actions/checkout@main
+
+      - name: Set Git user info
+        run: |
+          git config user.email "jefinojacob9488@gmail.com"
+          git config user.name "Jefino9488"
+        shell: bash
+
+      - name: prepareTheRequiredEnvironment
+        run: |
+          # Extract device name from the URL
+          URL="${{ github.event.inputs.URL }}"
+          device_name="${{ github.event.inputs.Name }}"
+          echo "device=$device_name" >> $GITHUB_ENV
+          echo "Device name: $device_name"
+
+          echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
+          sudo apt-get install python3 aria2 p7zip-full zstd
+
+      - name: Build ROM
+        run: |
+          sudo bash "$GITHUB_WORKSPACE"/aosp.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }}
+
+      - name: Upload Release
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
+          cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
+          cd "$GITHUB_WORKSPACE/GithubRelease"
+          split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_${{ env.version }}_fastboot-split.zip"
+          cd "$GITHUB_WORKSPACE"
+          touch file.log
+          echo -e "# ${device}_fastboot.zip\n" >> file.log
+          echo -e "## Fastboot version: ${{ env.version }}" > file.log
+          echo -e "This archive contains the Fastboot images for the device ${device}.\n" >> file.log
+          echo -e "## Contents\n" >> file.log
+          echo "- **images/**: Contains partition images." >> file.log
+          echo "- **boot/**: Includes the boot image." >> file.log
+          echo "- **twrp/**: Holds the TWRP image." >> file.log
+          echo "- **flasher.exe**: Flasher tool for the device." >> file.log
+          echo -e "\n## Flashing Instructions\n" >> file.log
+          echo "1. Download all splits and run the `merge.bat` to merge." >> file.log
+          echo "2. Extract the contents of merged archive to a convenient location." >> file.log
+          echo "3. Follow the flashing instructions provided by the flasher.exe." >> file.log
+          echo -e "\n## Notes\n" >> file.log
+          echo "- Ensure that you have the necessary tools and drivers installed before proceeding with the flashing process." >> file.log
+          echo -e "\nFor more details, refer to the device's official documentation.\n" >> file.log
+
+      - name: Create and Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{ github.workspace }}/GithubRelease/*
+          name: "${{ env.device }}_${{ env.version }}_fastboot"
+          tag: "${{ env.device }}_${{ env.version }}"
+          artifactErrorsFailBuild: true
+          allowUpdates: true
+          makeLatest: true
+          bodyFile: "${{ github.workspace }}/file.log"
+          token: ${{ secrets.GITHUB_TOKEN }}
