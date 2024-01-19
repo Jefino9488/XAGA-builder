@@ -81,6 +81,15 @@ for i in system_b system_ext_b product_b vendor_b odm_dlkm_b vendor_dlkm_b odm_b
     fi
 done
 
+# Convert sparse image files to regular image files
+for i in system_b system_ext_b product_b vendor_b odm_dlkm_b vendor_dlkm_b odm_b; do
+    file_path="$GITHUB_WORKSPACE/super_maker/${i}.img"
+    if file "$file_path" | grep -q "sparse"; then
+        echo "Converting $i.img to regular image format"
+        "$GITHUB_WORKSPACE"/tools/simg2img "$file_path" "$file_path"
+    fi
+done
+
 
 
 super_size=9126805504
