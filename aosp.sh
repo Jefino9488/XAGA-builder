@@ -100,19 +100,12 @@ total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_s
 "$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --metadata-slots 2 \
     --device super:"$super_size" --group main:"$total_size" \
     --partition system_a:readonly:"$system_size":main --image system_a=./super_maker/system.img \
-    --partition system_b:readonly:0:main --image system_b=./super_maker/system_b.img \
     --partition system_ext_a:readonly:"$system_ext_size":main --image system_ext_a=./super_maker/system_ext.img \
-    --partition system_ext_b:readonly:0:main --image system_ext_b=./super_maker/system_ext_b.img \
     --partition product_a:readonly:"$product_size":main --image product_a=./super_maker/product.img \
-    --partition product_b:readonly:0:main --image product_b=./super_maker/product_b.img \
     --partition vendor_a:readonly:"$vendor_size":main --image vendor_a=./super_maker/vendor.img \
-    --partition vendor_b:readonly:0:main --image vendor_b=./super_maker/vendor_b.img \
     --partition odm_dlkm_a:readonly:"$odm_dlkm_size":main --image odm_dlkm_a=./super_maker/odm_dlkm.img \
-    --partition odm_dlkm_b:readonly:0:main --image odm_dlkm_b=./super_maker/odm_dlkm_b.img \
     --partition odm_a:readonly:"$odm_size":main --image odm_a=./super_maker/odm.img \
-    --partition odm_b:readonly:0:main --image odm_b=./super_maker/odm_b.img \
     --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":main --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
-    --partition vendor_dlkm_b:readonly:0:main --image vendor_dlkm_b=./super_maker/vendor_dlkm_b.img \
     --sparse --output ./super.new.img
 
 if [ $? -ne 0 ]; then
