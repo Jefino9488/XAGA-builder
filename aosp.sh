@@ -70,10 +70,19 @@ for i in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
     # Define the path to the directory containing the image files
     eval "${i}_size=\$(du -sb \"$GITHUB_WORKSPACE/super_maker/$i.img\" | awk {'print \$1'})"
 done
+
+# Check if _b files exist, if not, create them with zero size
+for i in system_b system_ext_b product_b vendor_b odm_dlkm_b vendor_dlkm_b; do
+    if [ ! -e "$GITHUB_WORKSPACE/super_maker/${i}.img" ]; then
+        echo "Creating $i.img with zero size"
+        dd if=/dev/zero of="$GITHUB_WORKSPACE/super_maker/${i}.img" bs=1 count=0 seek=0
+    fi
+done
+
 super_size=9126805504
 # Calculate total size of all images
 total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_size + odm_dlkm_size + vendor_dlkm_size))
-Start_Time
+
 # Run lpmake command
 "$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --metadata-slots 2 \
     --device super:"$super_size" --group main:"$total_size" \
@@ -93,7 +102,6 @@ Start_Time
     --partition vendor_dlkm_b:readonly:0:main --image vendor_dlkm_b=./super_maker/vendor_dlkm_b.img \
     --sparse --output ./super.new.img
 
-End_Time super
 
 mv "$GITHUB_WORKSPACE/super_maker/super.img" "$GITHUB_WORKSPACE/${device}/images/"
 echo moved super
