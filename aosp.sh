@@ -74,10 +74,6 @@ done
 zip_file="$GITHUB_WORKSPACE/tools/fw.zip"
 extract_folder="$GITHUB_WORKSPACE/${device}/images"
 
-# Ensure the extraction folder exists
-mkdir -p "$extract_folder"
-
-# Extract the contents of the zip file to the destination folder
 unzip -q "$zip_file" -d "$extract_folder"
 
 super_size=9126805504
