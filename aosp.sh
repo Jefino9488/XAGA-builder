@@ -72,7 +72,7 @@ for i in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
 done
 
 # Check if _b files exist, if not, create them with zero size
-for i in system_b system_ext_b product_b vendor_b odm_dlkm_b vendor_dlkm_b; do
+for i in system_b system_ext_b product_b vendor_b odm_dlkm_b vendor_dlkm_b odm_b; do
     if [ ! -e "$GITHUB_WORKSPACE/super_maker/${i}.img" ]; then
         echo "Creating $i.img with zero size"
         dd if=/dev/zero of="$GITHUB_WORKSPACE/super_maker/${i}.img" bs=1 count=0 seek=0
