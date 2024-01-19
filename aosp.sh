@@ -71,7 +71,7 @@ for i in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
     eval "${i}_size=\$(du -sb \"$GITHUB_WORKSPACE/super_maker/$i.img\" | awk {'print \$1'})"
 done
 
-# Check if _b files exist, if not, create them with zero size
+
 for i in system_b system_ext_b product_b vendor_b odm_dlkm_b vendor_dlkm_b odm_b; do
     file_path="$GITHUB_WORKSPACE/super_maker/${i}.img"
 
@@ -81,32 +81,30 @@ for i in system_b system_ext_b product_b vendor_b odm_dlkm_b vendor_dlkm_b odm_b
     fi
 done
 
-# Convert sparse image files to regular image files
-for i in system_b system_ext_b product_b vendor_b odm_dlkm_b vendor_dlkm_b odm_b; do
-    file_path="$GITHUB_WORKSPACE/super_maker/${i}.img"
-    if file "$file_path" | grep -q "sparse"; then
-        echo "Converting $i.img to regular image format"
-        "$GITHUB_WORKSPACE"/tools/simg2img "$file_path" "$file_path"
-    fi
-done
-
-
-
 super_size=9126805504
 # Calculate total size of all images
 total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_size + odm_dlkm_size + vendor_dlkm_size))
-
+Start_Time
 # Run lpmake command
-"$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --metadata-slots 2 \
-    --device super:"$super_size" --group main:"$total_size" \
-    --partition system_a:readonly:"$system_size":main --image system_a=./super_maker/system.img \
-    --partition system_ext_a:readonly:"$system_ext_size":main --image system_ext_a=./super_maker/system_ext.img \
-    --partition product_a:readonly:"$product_size":main --image product_a=./super_maker/product.img \
-    --partition vendor_a:readonly:"$vendor_size":main --image vendor_a=./super_maker/vendor.img \
-    --partition odm_dlkm_a:readonly:"$odm_dlkm_size":main --image odm_dlkm_a=./super_maker/odm_dlkm.img \
-    --partition odm_a:readonly:"$odm_size":main --image odm_a=./super_maker/odm.img \
-    --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":main --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
+"$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --block-size 4096 --metadata-slots 3 \
+    --device super:"$super_size" --group main_a:"$total_size" --group main_b:"$total_size" --virtual-ab\
+    --partition system_a:readonly:"$system_size":main_a --image system_a=./super_maker/system.img \
+    --partition system_b:readonly:0:main_b --image system_b=./super_maker/system_b.img \
+    --partition system_ext_a:readonly:"$system_ext_size":main_a --image system_ext_a=./super_maker/system_ext.img \
+    --partition system_ext_b:readonly:0:main_b --image system_ext_b=./super_maker/system_ext_b.img \
+    --partition product_a:readonly:"$product_size":main_a --image product_a=./super_maker/product.img \
+    --partition product_b:readonly:0:main_b --image product_b=./super_maker/product_b.img \
+    --partition vendor_a:readonly:"$vendor_size":main_a --image vendor_a=./super_maker/vendor.img \
+    --partition vendor_b:readonly:0:main_b --image vendor_b=./super_maker/vendor_b.img \
+    --partition odm_dlkm_a:readonly:"$odm_dlkm_size":main_a --image odm_dlkm_a=./super_maker/odm_dlkm.img \
+    --partition odm_dlkm_b:readonly:0:main_b --image odm_dlkm_b=./super_maker/odm_dlkm_b.img \
+    --partition odm_a:readonly:"$odm_size":main_a --image odm_a=./super_maker/odm.img \
+    --partition odm_b:readonly:0:main_b --image odm_b=./super_maker/odm_b.img \
+    --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":main_a --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
+    --partition vendor_dlkm_b:readonly:0:main_b --image vendor_dlkm_b=./super_maker/vendor_dlkm_b.img \
     --sparse --output "$GITHUB_WORKSPACE"/super_maker/super.img
+
+End_Time super
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to create super image."
