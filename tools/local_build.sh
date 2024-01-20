@@ -43,7 +43,7 @@ lpmake --metadata-size 65536 --super-name super --block-size 4096 --metadata-slo
     --partition odm_dlkm_a:readonly:"$odm_dlkm_size":main --image odm_dlkm_a=./super_maker/odm_dlkm.img \
     --partition odm_a:readonly:"$odm_size":main --image odm_a=./super_maker/odm.img \
     --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":main --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
-    --sparse --output "$GITHUB_WORKSPACE"/super_maker/super.img
+    --output /super_maker/super.img --sparse
 End_Time super
 echo "Super image created successfully."
 
