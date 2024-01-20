@@ -12,7 +12,7 @@ rm -rf "$RECOVERY_ZIP"
 
 ### in xaga folder
 mkdir -p "/xaga/images"
-"/tools/payload-dumper-go" -o "/xaga/images" "/xaga/payload.bin" >/dev/null
+"payload-dumper-go" -o "/xaga/images" "/xaga/payload.bin" >/dev/null
 sudo rm -rf "/xaga/payload.bin"
 
 
@@ -24,7 +24,7 @@ for i in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
     eval "${i}_size=\$(du -sb \"/super_maker/$i.img\" | awk {'print \$1'})"
 done
 
-zip_file="/tools/fw.zip"
+zip_file="fw.zip"
 extract_folder="xaga/images"
 
 unzip -q "$zip_file" -d "$extract_folder"
@@ -34,7 +34,7 @@ super_size=9126805504
 total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_size + odm_dlkm_size + vendor_dlkm_size))
 Start_Time
 # Run lpmake command
-/tools/lpmake --metadata-size 65536 --super-name super --block-size 4096 --metadata-slots 2 \
+lpmake --metadata-size 65536 --super-name super --block-size 4096 --metadata-slots 2 \
     --device super:"$super_size" --group main:"$total_size" \
     --partition system_a:readonly:"$system_size":main --image system_a=./super_maker/system.img \
     --partition system_ext_a:readonly:"$system_ext_size":main --image system_ext_a=./super_maker/system_ext.img \
@@ -58,24 +58,9 @@ mv "xaga/images/boot.img" "/xaga/boot/"
 
 mv "xaga/images/vendor_boot.img" "xaga/twrp/"
 
-mv "/tools/flasher.exe" "xaga/"
+mv "flasher.exe" "xaga/"
 
 zip -r "/zip/xaga_fastboot.zip" "xaga"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
