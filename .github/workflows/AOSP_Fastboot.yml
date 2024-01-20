@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       URL:
-        description: official recovery rom
+        description: recovery rom direct link
         required: true
       Name:
-        description: enter device name
+        description: output name for the zip
         required: true
 
 jobs:
