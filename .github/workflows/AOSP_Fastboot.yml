@@ -58,7 +58,7 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
           cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
-          split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_${{ env.version }}_fastboot-split.zip"
+          split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_fastboot-split.zip"
           cd "$GITHUB_WORKSPACE"
           touch file.log
           echo -e "# ${device}_fastboot.zip\n" >> file.log
