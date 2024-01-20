@@ -81,8 +81,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
-          name: "${{ env.device }}_${{ env.version }}_fastboot"
-          tag: "${{ env.device }}_${{ env.version }}"
+          name: "${{ env.device }}_fastboot"
+          tag: "${{ env.device }}"
           artifactErrorsFailBuild: true
           allowUpdates: true
           makeLatest: true
