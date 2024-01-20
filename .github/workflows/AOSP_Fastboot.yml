@@ -62,8 +62,8 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           touch file.log
           echo -e "# ${device}_fastboot.zip\n" >> file.log
-          echo -e "## Fastboot version: ${{ env.version }}" > file.log
-          echo -e "This archive contains the Fastboot images for the device ${device}.\n" >> file.log
+          echo -e "## Fastboot version: ${{ env.device }}" > file.log
+          echo -e "This archive contains the Fastboot images for the device XAGA.\n" >> file.log
           echo -e "## Contents\n" >> file.log
           echo "- **images/**: Contains partition images." >> file.log
           echo "- **boot/**: Includes the boot image." >> file.log
