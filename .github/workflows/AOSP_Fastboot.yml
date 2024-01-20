@@ -50,11 +50,6 @@ jobs:
             echo "Error: Build failed. Exiting workflow."
             exit 1
           fi
-      - name: Upload to Google Cloud Storage
-        uses: google-github-actions/upload-cloud-storage@v2
-        with:
-          path: "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip"
-          destination: 'gs://xaga_test/'
 
       - name: Upload Release
         run: |
@@ -91,4 +86,3 @@ jobs:
           makeLatest: true
           bodyFile: "${{ github.workspace }}/file.log"
           token: ${{ secrets.GITHUB_TOKEN }}
-
