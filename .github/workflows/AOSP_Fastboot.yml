@@ -56,8 +56,6 @@ jobs:
           path: "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip"
           destination: 'gs://xaga_test/'
 
-      - name: Display Download Link
-        run: echo "Download Link: https://storage.googleapis.com/your-bucket-name/${{ env.device }}_fastboot.zip"
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
