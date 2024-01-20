@@ -41,8 +41,6 @@ jobs:
           device_name="${{ github.event.inputs.Name }}"
           echo "device=$device_name" >> $GITHUB_ENV
           echo "Device name: $device_name"
-
-          echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
           sudo apt-get install python3 aria2 p7zip-full zstd
 
       - name: Build ROM
@@ -52,7 +50,14 @@ jobs:
             echo "Error: Build failed. Exiting workflow."
             exit 1
           fi
+      - name: Upload to Google Cloud Storage
+        uses: google-github-actions/upload-cloud-storage@v2
+        with:
+          path: "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip"
+          destination: 'gs://xaga_test/'
 
+      - name: Display Download Link
+        run: echo "Download Link: https://storage.googleapis.com/your-bucket-name/${{ env.device }}_fastboot.zip"
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
@@ -88,3 +93,4 @@ jobs:
           makeLatest: true
           bodyFile: "${{ github.workspace }}/file.log"
           token: ${{ secrets.GITHUB_TOKEN }}
+
