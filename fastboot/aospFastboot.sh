@@ -128,19 +128,3 @@ echo "Created ${device}_fastboot.zip"
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

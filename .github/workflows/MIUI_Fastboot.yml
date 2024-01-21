@@ -44,7 +44,7 @@ jobs:
 
       - name: Build ROM
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/build.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }}
+          sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }}
 
       - name: Upload Release
         run: |
