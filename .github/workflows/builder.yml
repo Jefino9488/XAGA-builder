@@ -1,4 +1,4 @@
-name: Fastboot Builder
+name: MIUI Fastboot Builder
 
 on:
   workflow_dispatch:
