@@ -55,6 +55,8 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
           cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
+          cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
+          cp "$GITHUB_WORKSPACE/${device}/twrp/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
           split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_fastboot-split.zip"
           cd "$GITHUB_WORKSPACE"
@@ -73,7 +75,7 @@ jobs:
           echo "3. Follow the flashing instructions provided by the flasher.exe." >> file.log
           echo -e "\n## Notes\n" >> file.log
           echo "- Ensure that you have the necessary tools and drivers installed before proceeding with the flashing process." >> file.log
-          echo -e "\nFor more details, refer to the device's official documentation.\n" >> file.log
+          echo "- For more details, refer to the device's official documentation." >> file.log
 
       - name: Create and Upload Release
         uses: ncipollo/release-action@v1
