@@ -3,50 +3,12 @@ URL="$1"
 GITHUB_WORKSPACE="$2"
 device="$3"
 
-Start_Time() {
-  Start_ns=$(date +'%s%N')
-}
-
-End_Time() {
-  # Hours, minutes, seconds, milliseconds, nanoseconds
-  local h min s ms ns end_ns time
-  End_ns=$(date +'%s%N')
-  time=$(expr $End_ns - $Start_ns)
-  [[ -z "$time" ]] && return 0
-  ns=${time:0-9}
-  s=${time%$ns}
-  if [[ $s -ge 10800 ]]; then
-    echo -e "\e[1;34m - This time $1 took: less than 100 milliseconds \e[0m"
-  elif [[ $s -ge 3600 ]]; then
-    ms=$(expr $ns / 1000000)
-    h=$(expr $s / 3600)
-    h=$(expr $s % 3600)
-    if [[ $s -ge 60 ]]; then
-      min=$(expr $s / 60)
-      s=$(expr $s % 60)
-    fi
-    echo -e "\e[1;34m - This $1 time: $h hours $min minutes $s seconds $ms milliseconds \e[0m"
-  elif [[ $s -ge 60 ]]; then
-    ms=$(expr $ns / 1000000)
-    min=$(expr $s / 60)
-    s=$(expr $s % 60)
-    echo -e "\e[1;34m - This time $1 took: $min minutes $s seconds $ms milliseconds \e[0m"
-  elif [[ -n $s ]]; then
-    ms=$(expr $ns / 1000000)
-    echo -e "\e[1;34m - This time $1 took: $s seconds $ms milliseconds \e[0m"
-  else
-    ms=$(expr $ns / 1000000)
-    echo -e "\e[1;34m - This time $1 took: $ms milliseconds \e[0m"
-  fi
-}
 
 ### System package download
-echo -e "\e[1;31m - Start downloading package \e[0m"
-Start_Time
+echo -e "\e[1;31m - Downloading package \e[0m"
 aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" -o "recovery_rom.zip" "${URL}"
-End_Time Downloaded recovery rom
+echo -e "\e[1;31m - Downloaded recovery rom \e[0m"
 
-Start_Time
 sudo chmod -R 777 "$GITHUB_WORKSPACE/tools"
 mkdir -p "$GITHUB_WORKSPACE/${device}"
 mkdir -p "$GITHUB_WORKSPACE/super_maker/config"
@@ -60,7 +22,6 @@ rm -rf "${GITHUB_WORKSPACE:?}/$RECOVERY_ZIP"
 mkdir -p "$GITHUB_WORKSPACE/${device}/images"
 "$GITHUB_WORKSPACE/tools/payload-dumper-go" -o "$GITHUB_WORKSPACE/${device}/images" "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
-End_Time
 
 for i in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
     mv "$GITHUB_WORKSPACE/${device}/images/$i.img" "$GITHUB_WORKSPACE/super_maker/"
@@ -69,8 +30,6 @@ for i in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
     eval "${i}_size=\$(du -sb \"$GITHUB_WORKSPACE/super_maker/$i.img\" | awk {'print \$1'})"
 done
 
-
-Start_Time
 "$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --block-size 4096 \
 --partition mi_ext_a:readonly:"$mi_ext_size":dynamic_partitions_a --image mi_ext_a="$GITHUB_WORKSPACE"/super_maker/mi_ext.img \
 --partition mi_ext_b:readonly:0:dynamic_partitions_b \
@@ -88,7 +47,6 @@ Start_Time
 --partition vendor_dlkm_b:readonly:0:dynamic_partitions_b \
 --device super:9126805504 --metadata-slots 3 --group dynamic_partitions_a:9126805504 \
 --group dynamic_partitions_b:9126805504 --virtual-ab --output "$GITHUB_WORKSPACE"/super_maker/super.img
-End_Time super
 
 mv "$GITHUB_WORKSPACE/super_maker/super.img" "$GITHUB_WORKSPACE/${device}/images/"
 echo moved super

@@ -3,51 +3,13 @@ GITHUB_WORKSPACE="$2"
 device="$3"
 
 magiskPatch="$GITHUB_WORKSPACE"/magisk/boot_patch.sh
-Start_Time() {
-  Start_ns=$(date +'%s%N')
-}
-
-End_Time() {
-  # Hours, minutes, seconds, milliseconds, nanoseconds
-  local h min s ms ns end_ns time
-  End_ns=$(date +'%s%N')
-  time=$(expr $End_ns - $Start_ns)
-  [[ -z "$time" ]] && return 0
-  ns=${time:0-9}
-  s=${time%$ns}
-  if [[ $s -ge 10800 ]]; then
-    echo -e "\e[1;34m - Time $1 took: less than 100 milliseconds \e[0m"
-  elif [[ $s -ge 3600 ]]; then
-    ms=$(expr $ns / 1000000)
-    h=$(expr $s / 3600)
-    h=$(expr $s % 3600)
-    if [[ $s -ge 60 ]]; then
-      min=$(expr $s / 60)
-      s=$(expr $s % 60)
-    fi
-    echo -e "\e[1;34m - This $1 time: $h hours $min minutes $s seconds $ms milliseconds \e[0m"
-  elif [[ $s -ge 60 ]]; then
-    ms=$(expr $ns / 1000000)
-    min=$(expr $s / 60)
-    s=$(expr $s % 60)
-    echo -e "\e[1;34m - Time $1 took: $min minutes $s seconds $ms milliseconds \e[0m"
-  elif [[ -n $s ]]; then
-    ms=$(expr $ns / 1000000)
-    echo -e "\e[1;34m - Time $1 took: $s seconds $ms milliseconds \e[0m"
-  else
-    ms=$(expr $ns / 1000000)
-    echo -e "\e[1;34m - Time $1 took: $ms milliseconds \e[0m"
-  fi
-}
 
 
 ### System package download
 echo -e "\e[1;31m - Start downloading package \e[0m"
-Start_Time
 aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" -o "recovery_rom.zip" "${URL}"
-End_Time Downloaded recovery rom
+echo -e "\e[1;31m - Downloaded recovery rom \e[0m"
 
-Start_Time
 sudo chmod -R 777 "$GITHUB_WORKSPACE/tools"
 mkdir -p "$GITHUB_WORKSPACE/${device}"
 mkdir -p "$GITHUB_WORKSPACE/super_maker/config"
@@ -61,7 +23,6 @@ rm -rf "${GITHUB_WORKSPACE:?}/$RECOVERY_ZIP"
 mkdir -p "$GITHUB_WORKSPACE/${device}/images"
 "$GITHUB_WORKSPACE/tools/payload-dumper-go" -o "$GITHUB_WORKSPACE/${device}/images" "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
-End_Time
 
 # Move images to the super_maker directory
 for i in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
@@ -79,7 +40,7 @@ unzip -q "$zip_file" -d "$extract_folder"
 super_size=9126805504
 # Calculate total size of all images
 total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_size + odm_dlkm_size + vendor_dlkm_size))
-Start_Time
+
 # Run lpmake command
 "$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --block-size 4096 --metadata-slots 3 \
     --device super:"$super_size" --group main_a:"$total_size" --group main_b:"$total_size" \
@@ -98,8 +59,7 @@ Start_Time
     --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":main_a --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
     --partition vendor_dlkm_b:readonly:0:main_b \
     --virtual-ab --sparse --output "$GITHUB_WORKSPACE"/super_maker/super.img
-
-End_Time super
+echo -e "\e[1;31m - Super image created successfully. \e[0m"
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to create super image."
