@@ -2,7 +2,7 @@ URL="$1"
 GITHUB_WORKSPACE="$2"
 device="$3"
 
-
+magiskPatch="$GITHUB_WORKSPACE"/magisk/boot_patch.sh
 Start_Time() {
   Start_ns=$(date +'%s%N')
 }
@@ -115,6 +115,10 @@ mkdir -p "$GITHUB_WORKSPACE/${device}/twrp"
 mkdir -p "$GITHUB_WORKSPACE/zip"
 
 mv "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
+
+cp -n "$GITHUB_WORKSPACE/${device}/boot/boot.img" "$GITHUB_WORKSPACE/${device}/boot/magisk_boot.img"
+
+$magiskPatch "$GITHUB_WORKSPACE/${device}/boot/magisk_boot.img"
 
 mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${device}/twrp/"
 
