@@ -118,6 +118,8 @@ mv "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/bo
 
 cp -n "$GITHUB_WORKSPACE/${device}/boot/boot.img" "$GITHUB_WORKSPACE/${device}/boot/magisk_boot.img"
 
+chmod -R +x "$GITHUB_WORKSPACE/magisk"
+
 $magiskPatch "$GITHUB_WORKSPACE/${device}/boot/magisk_boot.img"
 
 mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${device}/twrp/"
