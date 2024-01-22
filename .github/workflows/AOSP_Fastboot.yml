@@ -41,7 +41,7 @@ jobs:
           device_name="${{ github.event.inputs.Name }}"
           echo "device=$device_name" >> $GITHUB_ENV
           echo "Device name: $device_name"
-          sudo apt-get install python3 aria2 p7zip-full zstd
+          sudo apt-get install python3 aria2 p7zip-full zstd dos2unix
 
       - name: Build ROM
         run: |
