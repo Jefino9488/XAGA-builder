@@ -120,7 +120,7 @@ chmod -R +x "$GITHUB_WORKSPACE/magisk"
 
 $magiskPatch "$GITHUB_WORKSPACE/${device}/boot/boot.img"
 
-
+mv "$GITHUB_WORKSPACE/magisk/new-boot.img" "$GITHUB_WORKSPACE/${device}/boot/magisk_boot.img"
 
 mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${device}/twrp/"
 
