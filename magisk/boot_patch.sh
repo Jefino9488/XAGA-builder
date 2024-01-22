@@ -248,6 +248,7 @@ fi
 
 ui_print "- Repacking boot image"
 ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
+mv new-boot.img magisk_boot.img
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos
