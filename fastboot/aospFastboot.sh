@@ -3,7 +3,7 @@ GITHUB_WORKSPACE="$2"
 device="$3"
 
 magiskPatch="$GITHUB_WORKSPACE"/magisk/boot_patch.sh
-magiskboot="$GITHUB_WORKSPACE"/magisk/magiskboot
+
 
 ### System package download
 echo -e "\e[1;31m - Start downloading package \e[0m"
@@ -73,21 +73,10 @@ echo moved super
 mkdir -p "$GITHUB_WORKSPACE/${device}/boot"
 mkdir -p "$GITHUB_WORKSPACE/${device}/twrp"
 mkdir -p "$GITHUB_WORKSPACE/zip"
-chmod -R +x "$GITHUB_WORKSPACE/magisk"
-
-mkdir -p "$GITHUB_WORKSPACE"/boot
-
-cp -f "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE"/boot
-
-$magiskboot unpack "$GITHUB_WORKSPACE"/boot/boot.img >/dev/null
-
-echo "boot/"
-ls -al "$GITHUB_WORKSPACE"/boot
-
-echo "boot/kernel"
-ls -al "$GITHUB_WORKSPACE"/boot/kernel
 
 cp "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
+
+chmod -R +x "$GITHUB_WORKSPACE/magisk"
 
 $magiskPatch "$GITHUB_WORKSPACE/${device}/boot/boot.img"
 
