@@ -1,4 +1,4 @@
-name: AOSP-Fastboot-Builder
+name: AOSP_Fastboot
 
 on:
   workflow_dispatch:

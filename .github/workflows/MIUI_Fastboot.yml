@@ -1,4 +1,4 @@
-name: MIUI Fastboot Builder
+name: MIUI_Fastboot
 
 on:
   workflow_dispatch:
@@ -81,3 +81,18 @@ jobs:
           makeLatest: true
           bodyFile: "${{ github.workspace }}/file.log"
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  notification:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    if: always()
+    steps:
+      - uses: martialonline/workflow-status@v3
+        id: check
+      - run: echo "Workflow failed"
+        if: steps.check.outputs.status == 'failure'
+      - run: echo "Workflow was cancelled"
+        if: steps.check.outputs.status == 'cancelled'
+      - run: echo "Workflow was successful"
+        if: steps.check.outputs.status == 'success'
