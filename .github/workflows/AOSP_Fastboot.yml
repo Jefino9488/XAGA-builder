@@ -77,7 +77,20 @@ jobs:
           echo -e "\n## Notes\n" >> file.log
           echo "- Ensure that you have the necessary tools and drivers installed before proceeding with the flashing process." >> file.log
           echo "- For more details, refer to the device's official documentation." >> file.log
-        
+
+      - name: Update GitHub status on success
+        uses: github-status-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          state: success
+          description: Build succeeded
+
+      - name: Update GitHub status on failure
+        uses: github-status-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          state: failure
+          description: Build failed
 
       - name: Create and Upload Release
         uses: ncipollo/release-action@v1
@@ -90,11 +103,6 @@ jobs:
           makeLatest: true
           bodyFile: "${{ github.workspace }}/file.log"
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Status
-        uses: Sibz/github-status-action@v1
-        with:
-          authToken: ${{secrets.GITHUB_TOKEN}}
-          context: 'Test run'
-          description: 'Passed'
-          state: 'success'
-          sha: ${{github.event.pull_request.head.sha || github.sha}}
+
+
+
