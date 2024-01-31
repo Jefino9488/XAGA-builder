@@ -71,6 +71,8 @@ mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${dev
 
 mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
 
+7z x "$GITHUB_WORKSPACE/tools/fw.zip" -o"$GITHUB_WORKSPACE/${device}/images" preloader_xaga.bin
+
 cd "$GITHUB_WORKSPACE" || exit
 zip -r "$GITHUB_WORKSPACE/zip/${device}_fastboot.zip" "${device}"
 
