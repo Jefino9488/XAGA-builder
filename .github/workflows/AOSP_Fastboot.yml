@@ -1,4 +1,4 @@
-name: AOSP Fastboot Builder
+name: AOSP-Fastboot-Builder
 
 on:
   workflow_dispatch:
@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
 
     steps:
       - name: maximizeYourBuildEnvironment
@@ -77,20 +78,8 @@ jobs:
           echo -e "\n## Notes\n" >> file.log
           echo "- Ensure that you have the necessary tools and drivers installed before proceeding with the flashing process." >> file.log
           echo "- For more details, refer to the device's official documentation." >> file.log
-
-      - name: Update GitHub status on success
-        uses: github-status-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          state: success
-          description: Build succeeded
-
-      - name: Update GitHub status on failure
-        uses: github-status-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          state: failure
-          description: Build failed
+        
+      
 
       - name: Create and Upload Release
         uses: ncipollo/release-action@v1
@@ -103,6 +92,20 @@ jobs:
           makeLatest: true
           bodyFile: "${{ github.workspace }}/file.log"
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  notification:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    if: always()
+    steps:
+      - uses: martialonline/workflow-status@v3
+        id: check
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ steps.check.outputs.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 
 
