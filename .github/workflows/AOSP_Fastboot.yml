@@ -101,9 +101,12 @@ jobs:
     steps:
       - uses: martialonline/workflow-status@v3
         id: check
-      - uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ steps.check.outputs.status }}
+      - run: echo "Workflow failed"
+        if: steps.check.outputs.status == 'failure'
+      - run: echo "Workflow was cancelled"
+        if: steps.check.outputs.status == 'cancelled'
+      - run: echo "Workflow was successful"
+        if: steps.check.outputs.status == 'success'
 
 
 
