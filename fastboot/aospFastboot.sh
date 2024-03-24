@@ -32,11 +32,6 @@ for i in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
     eval "${i}_size=\$(du -sb \"$GITHUB_WORKSPACE/super_maker/$i.img\" | awk {'print \$1'})"
 done
 
-zip_file="$GITHUB_WORKSPACE/tools/fw.zip"
-extract_folder="$GITHUB_WORKSPACE/${device}/images"
-
-unzip -q "$zip_file" -d "$extract_folder"
-
 super_size=9126805504
 # Calculate total size of all images
 total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_size + odm_dlkm_size + vendor_dlkm_size))
