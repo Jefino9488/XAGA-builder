@@ -56,13 +56,14 @@ jobs:
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
-          cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
+          
           cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
           threshold_size=$((1850 * 1024 * 1024))
           file_size=$(stat --printf="%s" "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip")
            if [ "$file_size" -gt "$threshold_size" ]; then
+              cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
               split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_fastboot-split.zip"
               cd "$GITHUB_WORKSPACE"
           else
@@ -76,12 +77,13 @@ jobs:
           echo -e "## Contents\n" >> file.log
           echo "- **images/**: Contains partition images." >> file.log
           echo "- **boot/**: Includes the boot image." >> file.log
-          echo "- **vendor_boot/**: Holds the TWRP image." >> file.log
+          echo "- **vendor_boot/**: Holds the vendor_boot image." >> file.log
           echo "- **flasher.exe**: Flasher tool for the device." >> file.log
           echo -e "\n## Flashing Instructions\n" >> file.log
-          echo "1. Download all splits and run the `merge.bat` to merge." >> file.log
-          echo "2. Extract the contents of merged archive to a convenient location." >> file.log
-          echo "3. Follow the flashing instructions provided by the flasher.exe." >> file.log
+          echo "1. Download the zip(if available and skip 2 else folow)." >> file.log
+          echo "2. Download all splits and run the `merge.bat` to merge." >> file.log
+          echo "3. Extract the contents of merged archive to a convenient location." >> file.log
+          echo "4. Follow the flashing instructions provided by the flasher.exe." >> file.log
           echo -e "\n## Notes\n" >> file.log
           echo "- Ensure that you have the necessary tools and drivers installed before proceeding with the flashing process." >> file.log
           echo "- For more details, refer to the device's official documentation." >> file.log
