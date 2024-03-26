@@ -68,6 +68,7 @@ jobs:
               cd "$GITHUB_WORKSPACE"
           else
               echo "File size is less than or equal to 1850MB. No need to split."
+              mv "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease"
           fi
           cd "$GITHUB_WORKSPACE"
           touch file.log
