@@ -60,7 +60,14 @@ jobs:
           cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
-          split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_fastboot-split.zip"
+          threshold_size=$((850 * 1024 * 1024))
+          file_size=$(stat --printf="%s" "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip")
+           if [ "$file_size" -gt "$threshold_size" ]; then
+              split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_fastboot-split.zip"
+              cd "$GITHUB_WORKSPACE"
+          else
+              echo "File size is less than or equal to 850MB. No need to split."
+          fi
           cd "$GITHUB_WORKSPACE"
           touch file.log
           echo -e "# ${device}_fastboot.zip\n" >> file.log
