@@ -67,7 +67,7 @@ jobs:
               split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_fastboot-split.zip"
               cd "$GITHUB_WORKSPACE"
           else
-              echo "File size is less than or equal to 850MB. No need to split."
+              echo "File size is less than or equal to 1850MB. No need to split."
           fi
           cd "$GITHUB_WORKSPACE"
           touch file.log
