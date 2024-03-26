@@ -58,7 +58,7 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
           cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
           cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
-          cp "$GITHUB_WORKSPACE/${device}/twrp/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
+          cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
           split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_fastboot-split.zip"
           cd "$GITHUB_WORKSPACE"
@@ -69,7 +69,7 @@ jobs:
           echo -e "## Contents\n" >> file.log
           echo "- **images/**: Contains partition images." >> file.log
           echo "- **boot/**: Includes the boot image." >> file.log
-          echo "- **twrp/**: Holds the TWRP image." >> file.log
+          echo "- **vendor_boot/**: Holds the TWRP image." >> file.log
           echo "- **flasher.exe**: Flasher tool for the device." >> file.log
           echo -e "\n## Flashing Instructions\n" >> file.log
           echo "1. Download all splits and run the `merge.bat` to merge." >> file.log
