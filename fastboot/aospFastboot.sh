@@ -66,12 +66,12 @@ mv "$GITHUB_WORKSPACE/super_maker/super.img" "$GITHUB_WORKSPACE/${device}/images
 echo moved super
 
 mkdir -p "$GITHUB_WORKSPACE/${device}/boot"
-mkdir -p "$GITHUB_WORKSPACE/${device}/twrp"
+mkdir -p "$GITHUB_WORKSPACE/${device}/vendor_boot"
 mkdir -p "$GITHUB_WORKSPACE/zip"
 
 mv "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
 
-mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${device}/twrp/"
+mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${device}/vendor_boot/"
 
 mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
 
