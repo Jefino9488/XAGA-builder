@@ -32,8 +32,8 @@ sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
 
 for i in product system system_ext vendor; do
   echo -e "${Yellow}- extracting: $i"
-  sudo $erofs_extract -i "$GITHUB_WORKSPACE"/images/$i.img -x
-  rm -rf "$GITHUB_WORKSPACE"/images/$i.img
+  sudo $erofs_extract -i "$GITHUB_WORKSPACE"/${device}/images/$i.img -x
+  rm -rf "$GITHUB_WORKSPACE"/${device}/images/$i.img
 done
 
 
@@ -42,7 +42,7 @@ done
 # Delete unnecessary directories
 apps=("wps-lite" "MIUIWeather" "MIUICleanMaster")
 
-all_dirs=$(sudo find "$GITHUB_WORKSPACE"/images/product/data-app/ -type d)
+all_dirs=$(sudo find "$GITHUB_WORKSPACE"/${device}/images/product/data-app/ -type d)
 
 while IFS= read -r dir; do
   dir_name=$(basename "$dir")
@@ -92,7 +92,7 @@ apps=("AutoRegistration"
     "RegService"
     "SettingsIntelligence")
 
-all_dirs=$(sudo find "$GITHUB_WORKSPACE"/images/product/priv-app/ -type d)
+all_dirs=$(sudo find "$GITHUB_WORKSPACE"/${device}/images/product/priv-app/ -type d)
 
 while IFS= read -r dir; do
   dir_name=$(basename "$dir")
@@ -121,18 +121,18 @@ partitions=("product" "system" "system_ext" "vendor")
 for partition in "${partitions[@]}"; do
   echo -e "${Red}- build img: $partition"
   sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py
-  "$GITHUB_WORKSPACE"/images/$partition
-  "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config
+  "$GITHUB_WORKSPACE"/${device}/images/$partition
+  "$GITHUB_WORKSPACE"/${device}/images/config/"$partition"_fs_config
   sudo python3 "$GITHUB_WORKSPACE"/tools/contextpatch.py
-  "$GITHUB_WORKSPACE"/images/$partition
-  "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts
+  "$GITHUB_WORKSPACE"/${device}/images/$partition
+  "$GITHUB_WORKSPACE"/${device}/images/config/"$partition"_file_contexts
   sudo $erofs_mkfs --quiet -zlz4hc,9 -T 1230768000 --mount-point /$partition --fs-config-file
-  "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config --file-contexts
-  "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts
-  "$GITHUB_WORKSPACE"/images/$partition.img "$GITHUB_WORKSPACE"/images/$partition
+  "$GITHUB_WORKSPACE"/${device}/images/config/"$partition"_fs_config --file-contexts
+  "$GITHUB_WORKSPACE"/${device}/images/config/"$partition"_file_contexts
+  "$GITHUB_WORKSPACE"/${device}/images/$partition.img "$GITHUB_WORKSPACE"/images/$partition
 
-  eval "${partition}_size=$(du -sb "$GITHUB_WORKSPACE"/images/$partition.img | awk '{print $1}')"
-  sudo rm -rf "$GITHUB_WORKSPACE"/images/$partition
+  eval "${partition}_size=$(du -sb "$GITHUB_WORKSPACE"/${device}/images/$partition.img | awk '{print $1}')"
+  sudo rm -rf "$GITHUB_WORKSPACE"/${device}/images/$partition
 done
 
 
