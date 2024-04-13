@@ -1,4 +1,4 @@
-name: MIUI_Fastboot
+name: HyperMod_Fastboot
 
 on:
   workflow_dispatch:
