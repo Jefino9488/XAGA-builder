@@ -36,27 +36,29 @@ for i in product system system_ext vendor; do
   rm -rf "$GITHUB_WORKSPACE"/${device}/images/$i.img
 done
 
+path="$GITHUB_WORKSPACE/${device}/images/"
+
+# List all directories
+dirs=$(ls -d "$path"*/)
+
+# Print the list of directories
+echo "Directories in $path:"
+echo "$dirs"
 
 
-
-# Delete unnecessary directories
 apps=("wps-lite" "MIUIWeather" "MIUICleanMaster")
 
-all_dirs=$(sudo find "$GITHUB_WORKSPACE"/${device}/images/product/data-app/ -type d)
+# Find all directories
+all_dirs=$(sudo find "$GITHUB_WORKSPACE/${device}/images/product/data-app/" -type d)
 
+# Iterate over each directory
 while IFS= read -r dir; do
+  # Get the base directory name
   dir_name=$(basename "$dir")
 
-  found=false
-
-  for app in "${apps[@]}"; do
-    if [[ "$app" == "$dir_name" ]]; then
-      found=true
-      break
-    fi
-  done
-  # If the directory is not in the apps array, delete it
-  if ! $found; then
+  # Check if the directory is in the apps array
+  if [[ ! " ${apps[@]} " =~ " $dir_name " ]]; then
+    # If the directory is not in the apps array, delete it
     echo -e "${Yellow}- Deleting directory: $dir"
     sudo rm -rf "$dir"
   fi
