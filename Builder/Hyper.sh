@@ -39,12 +39,13 @@ done
 path="$GITHUB_WORKSPACE/${device}/images/"
 
 # List all directories
-dirs=$(ls -d "$path"*/)
+dirs=$(find "$path" -type d)
 
 # Print the list of directories
 echo "Directories in $path:"
 echo "$dirs"
 
+exit 1
 
 apps=("wps-lite" "MIUIWeather" "MIUICleanMaster")
 
