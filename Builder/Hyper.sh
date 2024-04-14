@@ -10,7 +10,7 @@ Green='\033[1;32m'
 
 erofs_extract="$GITHUB_WORKSPACE"/tools/extract.erofs
 erofs_mkfs="$GITHUB_WORKSPACE"/tools/mkfs.erofs
-payload_extract="$GITHUB_WORKSPACE"/tools/payload_extract
+payload_extract="$GITHUB_WORKSPACE"/tools/payload-dumper-go
 
 ### System package download
 echo -e "\e[1;31m - Downloading package \e[0m"
