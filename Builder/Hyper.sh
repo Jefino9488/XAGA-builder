@@ -28,7 +28,7 @@ rm -rf "${GITHUB_WORKSPACE:?}/$RECOVERY_ZIP"
 
 ### in xaga folder
 mkdir -p "$GITHUB_WORKSPACE/${device}/images"
-$payload_extract -o "$GITHUB_WORKSPACE"/${device}/images -i "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
+$payload_extract -o "$GITHUB_WORKSPACE"/${device}/images "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
 
 for i in product system system_ext vendor; do
