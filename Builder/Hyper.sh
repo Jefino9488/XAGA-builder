@@ -32,7 +32,7 @@ sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
 
 for i in product system system_ext vendor; do
   echo -e "${Yellow}- extracting: $i"
-  sudo $erofs_extract -i "$GITHUB_WORKSPACE"/${device}/images/$i.img -x
+  sudo $erofs_extract -s -i "$GITHUB_WORKSPACE"/${device}/images/$i.img -x
   rm -rf "$GITHUB_WORKSPACE"/${device}/images/$i.img
 done
 
