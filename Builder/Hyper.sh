@@ -10,6 +10,7 @@ Green='\033[1;32m'
 
 erofs_extract="$GITHUB_WORKSPACE"/tools/extract.erofs
 erofs_mkfs="$GITHUB_WORKSPACE"/tools/mkfs.erofs
+payload_extract="$GITHUB_WORKSPACE"/tools/payload_extract
 
 ### System package download
 echo -e "\e[1;31m - Downloading package \e[0m"
@@ -27,7 +28,7 @@ rm -rf "${GITHUB_WORKSPACE:?}/$RECOVERY_ZIP"
 
 ### in xaga folder
 mkdir -p "$GITHUB_WORKSPACE/${device}/images"
-"$GITHUB_WORKSPACE/tools/payload-dumper-go" -o "$GITHUB_WORKSPACE/${device}/images" "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
+$payload_extract -s -o "$GITHUB_WORKSPACE/${device}/images" "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
 
 for i in product system system_ext vendor; do
