@@ -33,16 +33,17 @@ sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
 
 for i in product system system_ext vendor; do
   echo -e "${Yellow}- extracting: $i"
-  sudo $erofs_extract -s -i "$GITHUB_WORKSPACE"/images/$i.img -x
+  sudo $erofs_extract -s -i "$GITHUB_WORKSPACE"/${device}/images/$i.img -x
+  ls -d "$GITHUB_WORKSPACE/${device}/images"/*
   rm -rf "$GITHUB_WORKSPACE"/${device}/images/$i.img
 done
 
-ls -d "$GITHUB_WORKSPACE/images"/*
+ls -d "$GITHUB_WORKSPACE/${device}/images"/*
 
 # Delete unnecessary directories
 apps=("wps-lite" "MIUIWeather" "MIUICleanMaster")
 
-all_dirs=$(sudo find "$GITHUB_WORKSPACE"/images/product/data-app/ -type d)
+all_dirs=$(sudo find "$GITHUB_WORKSPACE"/${device}/images/product/data-app/ -type d)
 
 while IFS= read -r dir; do
   dir_name=$(basename "$dir")
