@@ -36,14 +36,18 @@ for i in product system system_ext vendor; do
   rm -rf "$GITHUB_WORKSPACE"/${device}/images/$i.img
 done
 
+
+# Define the path
 path="$GITHUB_WORKSPACE/${device}/images/"
 
 # List all directories
-dirs=$(find "$path" -type d)
+dirs=$(find "$path" -mindepth 1 -maxdepth 1 -type d)
 
 # Print the list of directories
 echo "Directories in $path:"
 echo "$dirs"
+
+
 
 exit 1
 
