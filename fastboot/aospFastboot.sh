@@ -4,7 +4,6 @@ device="$3"
 
 magiskPatch="$GITHUB_WORKSPACE"/magisk/boot_patch.sh
 
-
 ### System package download
 echo -e "\e[1;31m - Start downloading package \e[0m"
 aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" -o "recovery_rom.zip" "${URL}"
@@ -68,6 +67,14 @@ echo moved super
 mkdir -p "$GITHUB_WORKSPACE/${device}/boot"
 mkdir -p "$GITHUB_WORKSPACE/${device}/vendor_boot"
 mkdir -p "$GITHUB_WORKSPACE/zip"
+
+cp "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
+
+chmod -R +x "$GITHUB_WORKSPACE/magisk"
+
+$magiskPatch "$GITHUB_WORKSPACE/${device}/boot/boot.img"
+
+mv "$GITHUB_WORKSPACE/magisk/new-boot.img" "$GITHUB_WORKSPACE/${device}/boot/magisk_boot.img"
 
 mv "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
 

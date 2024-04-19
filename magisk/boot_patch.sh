@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #######################################################################################
 # Magisk Boot Image Patcher
 #######################################################################################
@@ -15,14 +15,11 @@
 # boot_patch.sh      script    A script to patch boot image for Magisk.
 #                  (this file) The script will use files in its same
 #                              directory to complete the patching process.
-# util_functions.sh  script    A script which hosts all functions required
-#                              for this script to work properly.
 # magiskinit         binary    The binary to replace /init.
-# magisk(32/64)      binary    The magisk binaries.
+# magisk32           binary    The magisk binaries.
+# magisk64           binary    The magisk binaries.
 # magiskboot         binary    A tool to manipulate boot images.
 # stub.apk           binary    The stub Magisk app to embed into ramdisk.
-# chromeos           folder    This folder includes the utility and keys to sign
-#                  (optional)  chromeos boot images. Only used for Pixel C.
 #
 #######################################################################################
 
@@ -45,6 +42,15 @@ getdir() {
   esac
 }
 
+ui_print() {
+  echo "$1"
+}
+
+abort() {
+  ui_print "$1"
+  exit 1
+}
+
 #################
 # Initialization
 #################
@@ -52,10 +58,6 @@ getdir() {
 if [ -z $SOURCEDMODE ]; then
   # Switch to the location of the script file
   cd "$(getdir "${BASH_SOURCE:-$0}")"
-  # Load utility functions
-  . ./util_functions.sh
-  # Check if 64-bit
-  api_level_arch_detect
 fi
 
 BOOTIMAGE="$1"
@@ -166,12 +168,12 @@ ui_print "- Patching ramdisk"
 SKIP32="#"
 SKIP64="#"
 if [ -f magisk64 ]; then
-  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk64 --preinit-device)
+  PREINITDEVICE=metadata
   ./magiskboot compress=xz magisk64 magisk64.xz
   unset SKIP64
 fi
 if [ -f magisk32 ]; then
-  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk32 --preinit-device)
+  PREINITDEVICE=metadata
   ./magiskboot compress=xz magisk32 magisk32.xz
   unset SKIP32
 fi
@@ -257,5 +259,3 @@ $CHROMEOS && sign_chromeos
 
 # Reset any error code
 true
-
-mv "$BOOTIMAGE" "$GITHUB_WORKSPACE/magisk"
