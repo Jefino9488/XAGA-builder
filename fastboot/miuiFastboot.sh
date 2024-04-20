@@ -3,6 +3,10 @@ URL="$1"
 GITHUB_WORKSPACE="$2"
 device="$3"
 
+Red='\033[1;31m'
+Yellow='\033[1;33m'
+Blue='\033[1;34m'
+Green='\033[1;32m'
 
 ### System package download
 echo -e "\e[1;31m - Downloading package \e[0m"
@@ -57,9 +61,19 @@ mkdir -p "$GITHUB_WORKSPACE/zip"
 
 magiskPatch="$GITHUB_WORKSPACE"/magisk/boot_patch.sh
 
+echo -e "${Yellow}- patching boot image"
 cp "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
 
+chmod -R +x "$GITHUB_WORKSPACE/magisk"
 
+$magiskPatch "$GITHUB_WORKSPACE/${device}/boot/boot.img"
+if [ $? -ne 0 ]; then
+    echo -e "${Red}- failed to patch boot image"
+    exit 1
+fi
+echo -e "${Blue}- patched boot image"
+
+mv "$GITHUB_WORKSPACE/magisk/new-boot.img" "$GITHUB_WORKSPACE/${device}/boot/magisk_boot.img"
 
 mv "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
 
@@ -67,9 +81,14 @@ mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${dev
 
 mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
 
-7z x "$GITHUB_WORKSPACE/tools/fw.zip" -o"$GITHUB_WORKSPACE/${device}/images" preloader_xaga.bin
+cp "$GITHUB_WORKSPACE/tools/preloader_ari.bin" "$GITHUB_WORKSPACE/${device}/images/"
 
+if [ -f "$GITHUB_WORKSPACE/${device}/images/preloader_ari.bin" ]; then
+    echo -e "${Green}preloader_ari.bin copied successfully"
+else
+    echo -e "${Red}Failed to copy preloader_ari.bin"
+fi
 cd "$GITHUB_WORKSPACE" || exit
 zip -r "$GITHUB_WORKSPACE/zip/${device}_fastboot.zip" "${device}"
 
-echo "Created ${device}_fastboot.zip"
+echo -e "${Green}- ${device}_fastboot.zip created successfully"
