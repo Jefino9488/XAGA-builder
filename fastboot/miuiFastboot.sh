@@ -8,7 +8,7 @@ Red='\033[1;31m'
 Yellow='\033[1;33m'
 Blue='\033[1;34m'
 Green='\033[1;32m'
-
+echo key: "$key"
 ### System package download
 echo -e "\e[1;31m - Downloading package \e[0m"
 aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" -o "recovery_rom.zip" "${URL}"
