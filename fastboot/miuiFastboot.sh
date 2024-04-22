@@ -2,6 +2,7 @@
 URL="$1"
 GITHUB_WORKSPACE="$2"
 device="$3"
+key="$4"
 
 Red='\033[1;31m'
 Yellow='\033[1;33m'
@@ -92,3 +93,5 @@ cd "$GITHUB_WORKSPACE" || exit
 zip -r "$GITHUB_WORKSPACE/zip/${device}_fastboot.zip" "${device}"
 
 echo -e "${Green}- ${device}_fastboot.zip created successfully"
+filePath="$GITHUB_WORKSPACE/zip/${device}_fastboot.zip"
+bash <(curl -s https://devuploads.com/upload.sh) -f "$filePath" -k "$key"
