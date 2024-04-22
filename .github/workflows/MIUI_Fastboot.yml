@@ -46,6 +46,7 @@ jobs:
         env:
           secret: ${{ secrets.DEVUPLOAD }}
         run: |
+          echo "secret is $secret"
           sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }} $secret
 
       - name: Upload Release
