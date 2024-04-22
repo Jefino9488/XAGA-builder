@@ -43,8 +43,10 @@ jobs:
           sudo apt-get install python3 aria2 p7zip-full zstd dos2unix
 
       - name: Build ROM
+        env:
+          secret: ${{ secrets.DEVUPLOAD }}
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }} ${{ secrets.DEVUPLOAD }}
+          sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }} $secret
 
       - name: Upload Release
         run: |
