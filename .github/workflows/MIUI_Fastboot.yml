@@ -14,8 +14,6 @@ jobs:
       contents: write
 
     steps:
-      - name: Debug Secret
-        run: echo "Secret value is ${{ secrets.DEVUPLOAD }}"
       - name: maximizeYourBuildEnvironment
         uses: easimon/maximize-build-space@master
         with:
@@ -43,16 +41,10 @@ jobs:
 
           echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
           sudo apt-get install python3 aria2 p7zip-full zstd dos2unix
-          
-      
-
 
       - name: Build ROM
-        env:
-          secret: ${{ secrets.DEVUPLOAD }}
         run: |
-          echo "secret is $secret"
-          sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }} $secret
+          sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }} ${{ secrets.DEVUPLOAD }}
 
       - name: Upload Release
         run: |
