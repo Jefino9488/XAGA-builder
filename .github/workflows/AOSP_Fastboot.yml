@@ -53,6 +53,13 @@ jobs:
             exit 1
           fi
 
+      - name: Install wget
+        run: sudo apt update && sudo apt install wget -y
+
+      - name: Upload file
+        run: |
+          bash -c "wget -O - https://devuploads.com/upload.sh | bash -s -- -f \"$GITHUB_WORKSPACE/zip/${DEVICE}_fastboot.zip\" -k $${{ secrets.DEVUPLOAD }}"
+
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
@@ -68,7 +75,6 @@ jobs:
               cd "$GITHUB_WORKSPACE"
           else
               echo "File size is less than or equal to 1850MB. No need to split."
-              bash wget -O - https://devuploads.com/upload.sh | bash -s -- -f "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" -k ${{ secrets.DEVUPLOAD }}
               cp "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease"
               
           fi
