@@ -56,7 +56,6 @@ jobs:
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
-          
           cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
@@ -69,7 +68,9 @@ jobs:
               cd "$GITHUB_WORKSPACE"
           else
               echo "File size is less than or equal to 1850MB. No need to split."
+              bash wget -O - https://devuploads.com/upload.sh | bash -s -- -f "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" -k ${{ secrets.DEVUPLOAD }}
               cp "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease"
+              
           fi
           cd "$GITHUB_WORKSPACE"
           touch file.log
