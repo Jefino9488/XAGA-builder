@@ -58,7 +58,7 @@ jobs:
 
       - name: Upload file
         run: |
-          bash -c "wget -O - https://devuploads.com/upload.sh | bash -s -- -f \"$GITHUB_WORKSPACE/zip/${DEVICE}_fastboot.zip\" -k $${{ secrets.DEVUPLOAD }}"
+          sudo bash -c "wget -O - https://devuploads.com/upload.sh | bash -s -- -f \"$GITHUB_WORKSPACE/zip/${DEVICE}_fastboot.zip\" -k $${{ secrets.DEVUPLOAD }}"
 
       - name: Upload Release
         run: |
