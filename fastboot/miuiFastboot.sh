@@ -93,6 +93,3 @@ cd "$GITHUB_WORKSPACE" || exit
 zip -r "$GITHUB_WORKSPACE/zip/${device}_fastboot.zip" "${device}"
 
 echo -e "${Green}- ${device}_fastboot.zip created successfully"
-filePath="$GITHUB_WORKSPACE/zip/${device}_fastboot.zip"
-
-wget -O - https://devuploads.com/upload.sh | bash -s -- -f "$filePath" -k "$key"
