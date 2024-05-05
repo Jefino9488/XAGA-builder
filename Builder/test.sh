@@ -26,7 +26,8 @@ android_version=$(echo ${URL} | cut -d"_" -f5 | cut -d"." -f1) # Android 版本�
 build_time=$(date) && build_utc=$(date -d "$build_time" +%s)   # 构建时间
 
 sudo chmod -R 777 "$GITHUB_WORKSPACE"/tools
-magiskboot="$GITHUB_WORKSPACE"/tools/magiskboot
+sudo chmod -R 777 "$GITHUB_WORKSPACE"/magisk
+magiskboot="$GITHUB_WORKSPACE"/magisk/magiskboot
 ksud="$GITHUB_WORKSPACE"/tools/ksud
 a7z="$GITHUB_WORKSPACE"/tools/7zzs
 zstd="$GITHUB_WORKSPACE"/tools/zstd
