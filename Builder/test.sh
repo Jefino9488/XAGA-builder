@@ -4,23 +4,24 @@ sudo timedatectl set-timezone Asia/Shanghai
 sudo apt-get remove -y firefox zstd
 sudo apt-get install python3 aria2
 
-URL="$1"              # Package download URL
-GITHUB_ENV="$2"       # Output environment variable
-GITHUB_WORKSPACE="$3" # Workspace directory
+URL="$1"
+VENDOR_URL="$2"
+GITHUB_ENV="$3"
+GITHUB_WORKSPACE="$4"
 
-device=xaga # 设备代号
+device=xaga
 
-Red='\033[1;31m'    # 粗体红色
-Yellow='\033[1;33m' # 粗体黄色
-Blue='\033[1;34m'   # 粗体蓝色
-Green='\033[1;32m'  # 粗体绿色
+Red='\033[1;31m' # bold red
+Yellow='\033[1;33m' # bold yellow
+Blue='\033[1;34m' # bold blue
+Green='\033[1;32m' # bold green
 
 port_os_version=$(echo ${URL} | cut -d"/" -f4)                   # 移植包的 OS 版本号, 例: OS1.0.7.0.UNACNXM
 port_version=$(echo ${port_os_version} | sed 's/OS1/V816/g')     # 移植包的实际版本号, 例: V816.0.7.0.UNACNXM
 port_zip_name=$(echo ${URL} | cut -d"/" -f5)                     # 移植包的 zip 名称, 例: miui_AURORA_OS1.0.7.0.UNACNXM_81a48e3c20_14.0.zip
 vendor_os_version=$(echo ${VENDOR_URL} | cut -d"/" -f4)          # 底包的 OS 版本号, 例: OS1.0.32.0.UNCCNXM
 vendor_version=$(echo ${vendor_os_version} | sed 's/OS1/V816/g') # 底包的实际版本号, 例: V816.0.32.0.UNCCNXM
-vendor_zip_name=$(echo ${VENDOR_URL} | cut -d"/" -f5)            # 底包的 zip 名称, 例: miui_HOUJI_OS1.0.32.0.UNCCNXM_4fd0e15877_14.0.zip
+port_zip_name=$(echo ${VENDOR_URL} | cut -d"/" -f5)        p
 
 android_version=$(echo ${URL} | cut -d"_" -f5 | cut -d"." -f1) # Android 版本号, 例: 14
 build_time=$(date) && build_utc=$(date -d "$build_time" +%s)   # 构建时间
@@ -74,25 +75,34 @@ End_Time() {
 }
 
 ### 系统包下载
-# Download the package
-echo -e "${Red}- Starting package download"
-echo -e "${Yellow}- Starting download"
+echo -e "${Red}- 开始下载系统包"
+echo -e "${Yellow}- 开始下载移植包"
 Start_Time
 aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" "$URL"
-End_Time Download
+End_Time 下载移植包
+Start_Time
+echo -e "${Yellow}- 开始下载底包"
+aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" "$VENDOR_URL"
+End_Time 下载底包
+### 系统包下载结束
 
-# Unpack the package
-echo -e "${Red}- Starting package extraction"
+### 解包
+echo -e "${Red}- 开始解压系统包"
 mkdir -p "$GITHUB_WORKSPACE"/Third_Party
 mkdir -p "$GITHUB_WORKSPACE"/"${device}"
 mkdir -p "$GITHUB_WORKSPACE"/images/config
 mkdir -p "$GITHUB_WORKSPACE"/zip
 
-echo -e "${Yellow}- Starting extraction"
+echo -e "${Yellow}- StartDecompressingTheTransplantPackage"
 Start_Time
 $a7z x "$GITHUB_WORKSPACE"/$port_zip_name -r -o"$GITHUB_WORKSPACE"/Third_Party >/dev/null
 rm -rf "$GITHUB_WORKSPACE"/$port_zip_name
-End_Time Extraction
+End_Time 解压移植包
+echo -e "${Yellow}- 开始解压底包"
+Start_Time
+$a7z x "$GITHUB_WORKSPACE"/${port_zip_name} -o"$GITHUB_WORKSPACE"/"${device}" payload.bin >/dev/null
+rm -rf "$GITHUB_WORKSPACE"/${port_zip_name}
+End_Time 解压底包
 mkdir -p "$GITHUB_WORKSPACE"/Extra_dir
 echo -e "${Red}- 开始解底包payload"
 $payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir/ -i "$GITHUB_WORKSPACE"/"${device}"/payload.bin -X system,system_ext,product -e -T0
