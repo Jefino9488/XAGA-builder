@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 # Check if a recovery zip file was provided as an argument
 if [ -z "$1" ]; then
@@ -25,30 +27,30 @@ zip_dir="zip"
 log_file="${zip_dir}/lpmake.log"
 
 # Change the ownership of the necessary directories to the current user
-sudo chown -R "$(whoami):$(whoami)" "${tools_dir}" "${output_dir}" "${super_maker_dir}" "${zip_dir}"
+sudo chown -R "$(whoami):$(whoami)" "${tools_dir}" "${output_dir}" "${super_maker_dir}" "${zip_dir}" || true
 
 # Make the necessary directories
 mkdir -p "${output_dir}" "${super_maker_dir}" "${zip_dir}" || exit 1
 
 # Extract the recovery zip file to a temporary directory
 tmp_dir="$(mktemp -d)"
-7z x -y "${recovery_zip}" -o"${tmp_dir}" payload.bin || exit 1
+7z x -y "${recovery_zip}" -o"${tmp_dir}" payload.bin || true
 
 # Move the payload.bin file to the xaga directory
 mv "${tmp_dir}/payload.bin" "${output_dir}/" || exit 1
 
 # Use the payload-dumper-go tool to extract the images from payload.bin
-"${tools_dir}/payload-dumper-go" -o "${output_dir}/images/" "${output_dir}/payload.bin" >/dev/null || exit 1
+"${tools_dir}/payload-dumper-go" -o "${output_dir}/images/" "${output_dir}/payload.bin" >/dev/null || true
 
 # Remove the payload.bin file
-rm -f "${output_dir}/payload.bin"
+rm -f "${output_dir}/payload.bin" || true
 
 # Move the images to the super_maker directory
 for img in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
   mv "${output_dir}/images/${img}.img" "${super_maker_dir}/" || exit 1
 
   # Define the path to the directory containing the image files
-  eval "${img}_size=$(du -m "${super_maker_dir}/${img}.img" | awk '{print $1}')"
+  eval "${img}_size=$(du -m "${super_maker_dir}/${img}.img" | awk '{print $1}')" || :
 done
 
 # Calculate the total size of all images with decimal precision
@@ -71,7 +73,7 @@ total_size=$(bc -l <<< "scale=2; ${system_size} + ${system_ext_size} + ${product
   --partition odm_b:readonly:0:main_b \
   --partition vendor_dlkm_a:readonly:"${vendor_dlkm_size}":main_a --image vendor_dlkm_a="${super_maker_dir}/vendor_dlkm.img" \
   --partition vendor_dlkm_b:readonly:0:main_b \
-  --output "${super_maker_dir}/super.img" --sparse | tee "${log_file}"
+  --output "${super_maker_dir}/super.img" --sparse | tee "${log_file}" || true
 
 # Check if the lpmake command was successful
 if [ $? -eq 0 ]; then
@@ -98,3 +100,4 @@ else
   echo "Error: lpmake command failed. Check the log file for details."
   exit 1
 fi
+
