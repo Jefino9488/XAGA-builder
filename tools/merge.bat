@@ -5,19 +5,21 @@ set "outputFile=_fastboot.zip"
 set "progress=0"
 set "totalFiles=0"
 
-rem Count total number of files
+rem Count total number of files and store their names in an array
+set "files[]="
 for /R %%i in (*_fastboot-split.zip) do (
     set /a totalFiles+=1
+    set "files[!totalFiles!]=%%i"
 )
 
 echo Merging %totalFiles% files into "%outputFile%"
 
-for /R %%i in (*_fastboot-split.zip) do (
-    set "filename=%%~ni"
-    set "filename=!filename:_fastboot-split=!"
+for /L %%i in (1, 1, %totalFiles%) do (
+    set "filename=!files[%%i]!_fastboot"
+    set "filename=!filename:~0,-4!"
 
-    echo Merging "!filename!!outputFile!"
-    copy /b "%%i" "!filename!!outputFile!" + && del "%%i"
+    echo Merging "!files[%%i]!" into "!filename!.zip"
+    copy /b "!files[%%i]!" "!filename!.zip" + && del "!files[%%i]!"
 
     set /a progress+=1
     echo Merged !progress! out of %totalFiles% files
