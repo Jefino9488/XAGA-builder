@@ -95,18 +95,17 @@ mkdir -p "${GITHUB_WORKSPACE}/${DEVICE}/vendor_boot"
 mkdir -p "${GITHUB_WORKSPACE}/zip"
 
 # Patch boot image
-cp "$GITHUB_WORKSPACE/${DEVICE}/images/boot.img" "$GITHUB_WORKSPACE/${DEVICE}/boot/"
-
-chmod -R +x "$GITHUB_WORKSPACE/magisk"
-
-$MAGISK_PATCH "$GITHUB_WORKSPACE/${DEVICE}/boot/boot.img"
+echo -e "${YELLOW}- patching boot image"
+cp "${GITHUB_WORKSPACE}/${DEVICE}/images/boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/boot/"
+chmod +x "${MAGISK_PATCH}"
+${MAGISK_PATCH} "${GITHUB_WORKSPACE}/${DEVICE}/boot/boot.img"
 if [ $? -ne 0 ]; then
-    echo -e "${Red}- failed to patch boot image"
+    echo -e "${RED}- failed to patch boot image"
     exit 1
 fi
-echo -e "${Blue}- patched boot image"
+echo -e "${BLUE}- patched boot image"
 
-mv "$GITHUB_WORKSPACE/magisk/new-boot.img" "$GITHUB_WORKSPACE/${DEVICE}/boot/magisk_boot.img"
+mv "${GITHUB_WORKSPACE}/magisk/new-boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/boot/magisk_boot.img"
 
 mv "${GITHUB_WORKSPACE}/${DEVICE}/images/boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/boot/"
 
