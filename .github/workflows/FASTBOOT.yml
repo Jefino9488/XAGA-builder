@@ -59,6 +59,7 @@ jobs:
       - name: Build ROM
         run: |
           if [ "${{ github.event.inputs.ROM_TYPE }}" == "MIUI" ]; then
+            echo "Building MIUI Fastboot"
             URL="${{ github.event.inputs.URL }}"
             device_name=$(basename "$URL" | cut -d'_' -f2 | cut -d'.' -f2)
             echo "device=$device_name" >> $GITHUB_ENV
