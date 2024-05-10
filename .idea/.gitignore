@@ -9,3 +9,23 @@
 /dataSources/
 /dataSources.local.xml
 
+# Ignore unnecessary files and directories
+*.tmp
+*.bak
+*.swp
+*.log
+*.backup
+.idea/
+.vscode/
+
+# Ignore JAR and Class files
+*.jar
+*.class
+
+# Ignore node_modules and bower_components for frontend projects
+node_modules/
+bower_components/
+
+# Ignore .git and .svn directories
+.git/
+.svn/
