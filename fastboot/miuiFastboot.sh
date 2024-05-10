@@ -1,95 +1,111 @@
+#!/bin/bash
 
-URL="$1"
-GITHUB_WORKSPACE="$2"
+set -e
+set -u
+set -o pipefail
+
+url="$1"
+github_workspace="$2"
 device="$3"
 key="$4"
 
-Red='\033[1;31m'
-Yellow='\033[1;33m'
-Blue='\033[1;34m'
-Green='\033[1;32m'
+color_red='\033[1;31m'
+color_yellow='\033[1;33m'
+color_blue='\033[1;34m'
+color_green='\033[1;32m'
 
-### System package download
-echo -e "\e[1;31m - Downloading package \e[0m"
-aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" -o "recovery_rom.zip" "${URL}"
-echo -e "\e[1;31m - Downloaded recovery rom \e[0m"
+# Download package
+echo -e "${color_red}- Downloading package${color_normal}"
+aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "${github_workspace}" -o "recovery_rom.zip" "${url}"
+echo -e "${color_red}- Downloaded recovery rom${color_normal}"
 
-sudo chmod -R 777 "$GITHUB_WORKSPACE/tools"
-mkdir -p "$GITHUB_WORKSPACE/${device}"
-mkdir -p "$GITHUB_WORKSPACE/super_maker/config"
-mkdir -p "$GITHUB_WORKSPACE/zip"
+# Set permissions and create directories
+sudo chmod -R 777 "${github_workspace}/tools"
+mkdir -p "${github_workspace}/${device}"
+mkdir -p "${github_workspace}/super_maker/config"
+mkdir -p "${github_workspace}/zip"
 
-RECOVERY_ZIP="recovery_rom.zip"
-7z x "$GITHUB_WORKSPACE/$RECOVERY_ZIP" -o"$GITHUB_WORKSPACE/${device}" payload.bin
-rm -rf "${GITHUB_WORKSPACE:?}/$RECOVERY_ZIP"
+# Extract recovery zip
+recovery_zip="recovery_rom.zip"
+7z x "${github_workspace}/${recovery_zip}" -o"${github_workspace}/${device}" payload.bin
+rm -rf "${github_workspace}/${recovery_zip}"
 
-### in xaga folder
-mkdir -p "$GITHUB_WORKSPACE/${device}/images"
-"$GITHUB_WORKSPACE/tools/payload-dumper-go" -o "$GITHUB_WORKSPACE/${device}/images" "$GITHUB_WORKSPACE/${device}/payload.bin" >/dev/null
-sudo rm -rf "$GITHUB_WORKSPACE/${device}/payload.bin"
+# Extract images from payload.bin
+mkdir -p "${github_workspace}/${device}/images"
+"${github_workspace}/tools/payload-dumper-go" -o "${github_workspace}/${device}/images" "${github_workspace}/${device}/payload.bin" >/dev/null
+sudo rm -rf "${github_workspace}/${device}/payload.bin"
 
-for i in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
-    mv "$GITHUB_WORKSPACE/${device}/images/$i.img" "$GITHUB_WORKSPACE/super_maker/"
+# Move image files to super_maker directory
+for img in vendor product system system_ext odm_dlkm odm mi_ext vendor_dlkm; do
+    mv "${github_workspace}/${device}/images/${img}.img" "${github_workspace}/super_maker/"
 
     # Define the path to the directory containing the image files
-    eval "${i}_size=\$(du -sb \"$GITHUB_WORKSPACE/super_maker/$i.img\" | awk {'print \$1'})"
+    eval "${img}_size=$(du -sb "${github_workspace}/super_maker/${img}.img" | awk {'print $1'})"
 done
 
-"$GITHUB_WORKSPACE"/tools/lpmake --metadata-size 65536 --super-name super --block-size 4096 \
---partition mi_ext_a:readonly:"$mi_ext_size":dynamic_partitions_a --image mi_ext_a="$GITHUB_WORKSPACE"/super_maker/mi_ext.img \
+# Create super image
+"${github_workspace}/tools/lpmake" --metadata-size 65536 --super-name super --block-size 4096 \
+--partition mi_ext_a:readonly:"${mi_ext_size}":dynamic_partitions_a --image mi_ext_a="${github_workspace}/super_maker/mi_ext.img" \
 --partition mi_ext_b:readonly:0:dynamic_partitions_b \
---partition odm_a:readonly:"$odm_size":dynamic_partitions_a --image odm_a="$GITHUB_WORKSPACE"/super_maker/odm.img \
+--partition odm_a:readonly:"${odm_size}":dynamic_partitions_a --image odm_a="${github_workspace}/super_maker/odm.img" \
 --partition odm_b:readonly:0:dynamic_partitions_b \
---partition product_a:readonly:"$product_size":dynamic_partitions_a --image product_a="$GITHUB_WORKSPACE"/super_maker/product.img \
+--partition product_a:readonly:"${product_size}":dynamic_partitions_a --image product_a="${github_workspace}/super_maker/product.img" \
 --partition product_b:readonly:0:dynamic_partitions_b \
---partition system_a:readonly:"$system_size":dynamic_partitions_a --image system_a="$GITHUB_WORKSPACE"/super_maker/system.img \
+--partition system_a:readonly:"${system_size}":dynamic_partitions_a --image system_a="${github_workspace}/super_maker/system.img" \
 --partition system_b:readonly:0:dynamic_partitions_b \
---partition system_ext_a:readonly:"$system_ext_size":dynamic_partitions_a --image system_ext_a="$GITHUB_WORKSPACE"/super_maker/system_ext.img \
+--partition system_ext_a:readonly:"${system_ext_size}":dynamic_partitions_a --image system_ext_a="${github_workspace}/super_maker/system_ext.img" \
 --partition system_ext_b:readonly:0:dynamic_partitions_b \
---partition vendor_a:readonly:"$vendor_size":dynamic_partitions_a --image vendor_a="$GITHUB_WORKSPACE"/super_maker/vendor.img \
+--partition vendor_a:readonly:"${vendor_size}":dynamic_partitions_a --image vendor_a="${github_workspace}/super_maker/vendor.img" \
 --partition vendor_b:readonly:0:dynamic_partitions_b \
---partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":dynamic_partitions_a --image vendor_dlkm_a="$GITHUB_WORKSPACE"/super_maker/vendor_dlkm.img \
+--partition vendor_dlkm_a:readonly:"${vendor_dlkm_size}":dynamic_partitions_a --image vendor_dlkm_a="${github_workspace}/super_maker/vendor_dlkm.img" \
 --partition vendor_dlkm_b:readonly:0:dynamic_partitions_b \
 --device super:9126805504 --metadata-slots 3 --group dynamic_partitions_a:9126805504 \
---group dynamic_partitions_b:9126805504 --virtual-ab --output "$GITHUB_WORKSPACE"/super_maker/super.img
+--group dynamic_partitions_b:9126805504 --virtual-ab --output "${github_workspace}/super_maker/super.img"
 
-mv "$GITHUB_WORKSPACE/super_maker/super.img" "$GITHUB_WORKSPACE/${device}/images/"
-echo moved super
+# Move super.img to images directory
+mv "${github_workspace}/super_maker/super.img" "${github_workspace}/${device}/images/"
+echo "moved super.img"
 
-mkdir -p "$GITHUB_WORKSPACE/${device}/boot"
-mkdir -p "$GITHUB_WORKSPACE/${device}/vendor_boot"
-mkdir -p "$GITHUB_WORKSPACE/zip"
+# Create boot and vendor_boot directories
+mkdir -p "${github_workspace}/${device}/boot"
+mkdir -p "${github_workspace}/${device}/vendor_boot"
+mkdir -p "${github_workspace}/zip"
 
-magiskPatch="$GITHUB_WORKSPACE"/magisk/boot_patch.sh
+# Patch boot image
+magisk_patch="${github_workspace}/magisk/boot_patch.sh"
 
-echo -e "${Yellow}- patching boot image"
-cp "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
+echo -e "${color_yellow}- patching boot image${color_normal}"
+cp "${github_workspace}/${device}/images/boot.img" "${github_workspace}/${device}/boot/"
 
-chmod -R +x "$GITHUB_WORKSPACE/magisk"
+chmod +x "${github_workspace}/magisk"
 
-$magiskPatch "$GITHUB_WORKSPACE/${device}/boot/boot.img"
-if [ $? -ne 0 ]; then
-    echo -e "${Red}- failed to patch boot image"
+if "${magisk_patch}" "${github_workspace}/${device}/boot/boot.img"; then
+    echo -e "${color_blue}- patched boot image${color_normal}"
+else
+    echo -e "${color_red}- failed to patch boot image${color_normal}"
     exit 1
 fi
-echo -e "${Blue}- patched boot image"
 
-mv "$GITHUB_WORKSPACE/magisk/new-boot.img" "$GITHUB_WORKSPACE/${device}/boot/magisk_boot.img"
+# Move patched boot image to boot directory
+mv "${github_workspace}/magisk/new-boot.img" "${github_workspace}/${device}/boot/magisk_boot.img"
 
-mv "$GITHUB_WORKSPACE/${device}/images/boot.img" "$GITHUB_WORKSPACE/${device}/boot/"
+# Move original boot and vendor_boot images to their respective directories
+mv "${github_workspace}/${device}/images/boot.img" "${github_workspace}/${device}/boot/"
+mv "${github_workspace}/${device}/images/vendor_boot.img" "${github_workspace}/${device}/vendor_boot/"
 
-mv "$GITHUB_WORKSPACE/${device}/images/vendor_boot.img" "$GITHUB_WORKSPACE/${device}/vendor_boot/"
+# Copy flasher.exe to device directory
+cp "${github_workspace}/tools/flasher.exe" "${github_workspace}/${device}/"
 
-mv "$GITHUB_WORKSPACE/tools/flasher.exe" "$GITHUB_WORKSPACE/${device}/"
-
-cp "$GITHUB_WORKSPACE/tools/preloader_ari.bin" "$GITHUB_WORKSPACE/${device}/images/"
-
-if [ -f "$GITHUB_WORKSPACE/${device}/images/preloader_ari.bin" ]; then
-    echo -e "${Green}preloader_ari.bin copied successfully"
+# Copy preloader_ari.bin to images directory
+if [ -f "${github_workspace}/tools/preloader_ari.bin" ]; then
+    cp "${github_workspace}/tools/preloader_ari.bin" "${github_workspace}/${device}/images/"
+    echo -e "${color_green}preloader_ari.bin copied successfully${color_normal}"
 else
-    echo -e "${Red}Failed to copy preloader_ari.bin"
+    echo -e "${color_red}Failed to copy preloader_ari.bin${color_normal}"
 fi
-cd "$GITHUB_WORKSPACE" || exit
-zip -r "$GITHUB_WORKSPACE/zip/${device}_fastboot.zip" "${device}"
 
-echo -e "${Green}- ${device}_fastboot.zip created successfully"
+# Create zip file
+cd "${github_workspace}" || exit
+zip -r "${github_workspace}/zip/${device}_fastboot.zip" "${device}"
+
+echo -e "${color_green}- ${device}_fastboot.zip created successfully${color_normal}"
