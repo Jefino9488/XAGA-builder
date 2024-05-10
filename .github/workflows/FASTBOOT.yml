@@ -1,0 +1,76 @@
+name: Fastboot
+
+on:
+  workflow_dispatch:
+    inputs:
+      URL:
+        description: recovery rom direct link
+        required: true
+
+      Name:
+        description: output name for the zip
+        required: true
+
+      ROM_TYPE:
+        description: Select ROM type
+        required: true
+        options:
+          - MIUI
+          - AOSP
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      - name: maximizeYourBuildEnvironment
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 8192
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+
+      - name: CheckOutWarehouseFiles
+        uses: actions/checkout@main
+
+      - name: Set Git user info
+        run: |
+          git config user.email "jefinojacob9488@gmail.com"
+          git config user.name "Jefino9488"
+        shell: bash
+
+      - name: prepareTheRequiredEnvironment
+        env:
+          device_name: ${{ github.event.inputs.Name }}
+          rom_type: ${{ github.event.inputs.ROM_TYPE }}
+        run: |
+          sudo apt-get install python3 aria2 p7zip-full zstd dos2unix
+
+      - name: Build ROM
+        run: |
+          if [ "${{ env.rom_type }}" == "MIUI" ]; then
+            sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device_name }}
+          else
+            sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device_name }}
+          fi
+          if [ $? -ne 0 ]; then
+            echo "Error: Build failed. Exiting workflow."
+            exit 1
+          fi
+
+      - name: Upload Release
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
+          cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
+          cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
+          cd "$GITHUB_WORKSPACE/GithubRelease"
+          chmod +w "$GITHUB_WORKSPACE/GithubRelease"
+          threshold_size=$((1850 * 1024 * 1024))
+          file_size=$(stat --printf="%s" "$GITHUB_WORKSPACE/zip/${{ env.device_name }}_fastboot.zip")
+          if [ "$file_size" -gt "$threshold_size" ]; then
+            cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
+            split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device_name }}_fastboot.
