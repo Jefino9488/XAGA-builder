@@ -8,6 +8,7 @@ url="$1"
 github_workspace="$2"
 device="$3"
 
+MAGISK_PATCH="${github_workspace}/magisk/boot_patch.sh"
 RED='\033[1;31m'
 YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
