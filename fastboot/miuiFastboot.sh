@@ -38,7 +38,7 @@ echo -e "${BLUE}- extracted payload.bin"
 # Extract images
 echo -e "${YELLOW}- extracting images"
 mkdir -p "${github_workspace}/${device}/images"
-"${github_workspace}/tools/payload-dumper-go" -o "${github_workspace}/${device}/images" "${GITHUB_WORKSPACE}/${DEVICE}/payload.bin" >/dev/null
+"${github_workspace}/tools/payload-dumper-go" -o "${github_workspace}/${device}/images" "${github_workspace}/${device}/payload.bin" >/dev/null
 sudo rm -rf "${github_workspace}/${device}/payload.bin"
 echo -e "${BLUE}- extracted images"
 
