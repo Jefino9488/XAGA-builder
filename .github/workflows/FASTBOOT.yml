@@ -70,7 +70,7 @@ jobs:
             echo "device=${{ github.event.inputs.Name }}" >> $GITHUB_ENV
             echo "version=$(echo ${{ github.event.inputs.Name }})" >> $GITHUB_ENV
             sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh "${{ github.event.inputs.URL }}" $GITHUB_WORKSPACE "${{ github.event.inputs.Name }}"
-          fi
+          fi 
           if [ $? -ne 0 ]; then
             echo "Error: Build failed. Exiting workflow."
             exit 1
