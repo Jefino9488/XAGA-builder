@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ############################################
 # Magisk General Utility Functions
@@ -25,10 +25,10 @@ MAGISKBIN=
 ###################
 
 ui_print() {
-  if $BOOTMODE; then
-    echo "$1"
+  if [ "$BOOTMODE" = true ]; then
+    echo -n "$1"
   else
-    echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
+    echo -ne "ui_print $1\nui_print" > /proc/self/fd/$OUTFD
   fi
 }
 
@@ -37,24 +37,33 @@ toupper() {
 }
 
 grep_cmdline() {
-  local REGEX="s/^$1=//p"
+  local REGEX="$1"
+  local FILE=/proc/cmdline
+  [ -e "$FILE" ] || return 1
   if [ -n "$2" ]; then
-    echo $(cat /proc/cmdline)$(sed -e 's/[^"]//g' -e 's/""//g' /proc/cmdline) | xargs -n 1 | grep -E "$REGEX"
+    sed -nEz "s/^$REGEX//p" "$FILE" | xargs -r -d ''
   else
-    echo $(cat /proc/cmdline)$(sed -e 's/[^"]//g' -e 's/""//g' /proc/cmdline) | xargs -n 1 | grep -E "$REGEX" | head -n 1
+    sed -nEz "s/^$REGEX//p" "$FILE" | head -n 1 | xargs -r
   fi
 }
 
 grep_prop() {
-  local REGEX="s/^$1=//p"
+  local REGEX="$1"
   shift
-  local FILES=$@
+  local FILES="$@"
   [ -z "$FILES" ] && FILES='/system/build.prop'
   if [ -n "$FILES" ]; then
-    cat $FILES 2>/dev/null | dos2unix | sed -n "$REGEX" | head -n 1
+    for FILE in $FILES; do
+      [ -e "$FILE" ] || continue
+      dos2unix -q "$FILE" || return 1
+      sed -nEz "s/^$REGEX//p" "$FILE" | xargs -r -d '' || return 1
+    done
   fi
 }
 
 grep_get_prop() {
-  local result=$(grep_prop $@)
-  if [ -n "$result
+  local result=$(grep_prop -w -i -P "$@" /system/build.prop /vendor/build.prop)
+  [ -n "$result" ] || return 1
+  echo "$result" | sed -ne 's/^[^=]*=//p'
+}
+
