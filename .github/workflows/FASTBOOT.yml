@@ -85,7 +85,7 @@ jobs:
           chmod +w "$GITHUB_WORKSPACE/GithubRelease"
           threshold_size=$((1850 * 1024 * 1024))
           file_size=$(stat --printf="%s" "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip")
-           if [ "$file_size" -gt "$threshold_size" ]; then
+          if [ "$file_size" -gt "$threshold_size" ]; then
               cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
               split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.version }}_fastboot-split.zip"
               cd "$GITHUB_WORKSPACE"
