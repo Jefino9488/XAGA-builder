@@ -98,7 +98,6 @@ mkdir -p "${GITHUB_WORKSPACE}/zip"
 echo -e "${YELLOW}- patching boot image"
 cp "${GITHUB_WORKSPACE}/${DEVICE}/images/boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/boot/"
 chmod -R +x "$GITHUB_WORKSPACE/magisk"
-chmod +x "${MAGISK_PATCH}"
 ${MAGISK_PATCH} "${GITHUB_WORKSPACE}/${DEVICE}/boot/boot.img"
 if [ $? -ne 0 ]; then
     echo -e "${RED}- failed to patch boot image"
