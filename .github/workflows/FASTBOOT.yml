@@ -13,6 +13,7 @@ on:
 
       ROM_TYPE:
         description: Select ROM type
+        type: choice
         required: true
         options:
           - MIUI
