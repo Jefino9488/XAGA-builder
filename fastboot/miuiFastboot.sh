@@ -79,12 +79,14 @@ cp "${github_workspace}/${device}/images/boot.img" "${github_workspace}/${device
 
 chmod +x "${github_workspace}/magisk"
 
-if "${magisk_patch}" "${github_workspace}/${device}/boot/boot.img"; then
-    echo -e "${color_blue}- patched boot image"
-else
-    echo -e "${color_red}- failed to patch boot image"
+chmod +x "${magisk_patch}"
+
+${magisk_patch} "${github_workspace}/${device}/boot/boot.img"
+if [ $? -ne 0 ]; then
+    echo -e "${RED}- failed to patch boot image"
     exit 1
 fi
+echo -e "${BLUE}- patched boot image"
 
 # Move patched boot image to boot directory
 mv "${github_workspace}/magisk/new-boot.img" "${github_workspace}/${device}/boot/magisk_boot.img"
