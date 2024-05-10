@@ -59,16 +59,16 @@ jobs:
       - name: Build ROM
         run: |
           if [ "${{ github.event.inputs.ROM_TYPE }}" == "MIUI" ]; then
-             URL="${{ github.event.inputs.URL }}"
-             device_name=$(basename "$URL" | cut -d'_' -f2 | cut -d'.' -f2)
-             echo "device=$device_name" >> $GITHUB_ENV
-             echo "Device name: $device_name"
-             echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
-             sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }}
+            URL="${{ github.event.inputs.URL }}"
+            device_name=$(basename "$URL" | cut -d'_' -f2 | cut -d'.' -f2)
+            echo "device=$device_name" >> $GITHUB_ENV
+            echo "Device name: $device_name"
+            echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d'/' -f4)" >> $GITHUB_ENV
+            sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh "${{ github.event.inputs.URL }}" $GITHUB_WORKSPACE "${{ env.device }}"
           else
-             echo "Building AOSP Fastboot"
-             echo "version=$(echo ${{ github.event.inputs.Name }}" >> $GITHUB_ENV
-             sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ github.event.inputs.Name }}
+            echo "Building AOSP Fastboot"
+            echo "version=$(echo ${{ github.event.inputs.Name }})" >> $GITHUB_ENV
+            sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh "${{ github.event.inputs.URL }}" $GITHUB_WORKSPACE "${{ github.event.inputs.Name }}"
           fi
           if [ $? -ne 0 ]; then
             echo "Error: Build failed. Exiting workflow."
