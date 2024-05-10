@@ -14,7 +14,6 @@ on:
         options:
           - MIUI
           - AOSP
-
       Name:
         description: output name for the zip
         required: false
@@ -67,6 +66,7 @@ jobs:
              echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
              sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }}
           else
+             echo "Building AOSP Fastboot"
              echo "version=$(echo ${{ github.event.inputs.Name }}" >> $GITHUB_ENV
              sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ github.event.inputs.Name }}
           fi
