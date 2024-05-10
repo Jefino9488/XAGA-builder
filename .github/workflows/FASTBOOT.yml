@@ -67,6 +67,7 @@ jobs:
             sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh "${{ github.event.inputs.URL }}" $GITHUB_WORKSPACE "${{ env.device }}"
           else
             echo "Building AOSP Fastboot"
+            echo "device="${{ github.event.inputs.Name }}" >> $GITHUB_ENV
             echo "version=$(echo ${{ github.event.inputs.Name }})" >> $GITHUB_ENV
             sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh "${{ github.event.inputs.URL }}" $GITHUB_WORKSPACE "${{ github.event.inputs.Name }}"
           fi
