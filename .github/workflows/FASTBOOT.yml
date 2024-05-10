@@ -46,14 +46,20 @@ jobs:
 
       - name: prepareTheRequiredEnvironment
         env:
-
           rom_type: ${{ github.event.inputs.ROM_TYPE }}
         run: |
+          # Extract device name from the URL
+          URL="${{ github.event.inputs.URL }}"
+          device_name=$(basename "$URL" | cut -d'_' -f2 | cut -d'.' -f2)
+          echo "device=$device_name" >> $GITHUB_ENV
+          echo "Device name: $device_name"
+
+          echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
           sudo apt-get install python3 aria2 p7zip-full zstd dos2unix
 
       - name: Build ROM
         run: |
-          if [ "${{ env.rom_type }}" == "MIUI" ]; then
+          if [ "${{ github.event.inputs.ROM_TYPE }}" == "MIUI" ]; then
              URL="${{ github.event.inputs.URL }}"
              device_name=$(basename "$URL" | cut -d'_' -f2 | cut -d'.' -f2)
              echo "device=$device_name" >> $GITHUB_ENV
