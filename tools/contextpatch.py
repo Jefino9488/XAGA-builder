@@ -3,10 +3,13 @@
 
 import os
 from difflib import SequenceMatcher
-from typing import Generator, Any
 from re import escape, match
+from typing import Dict, Generator, Any, List, Union
 
-fix_permission = {
+FixPermission = Dict[str, str]
+Context = Dict[str, List[str]]
+
+fix_permission: FixPermission = {
     r"/system_ext/lost\+found": "u:object_r:system_file:s0",
     r"/product/lost\+found": "u:object_r:system_file:s0",
     r"/mi_ext/lost\+found": "u:object_r:system_file:s0",
@@ -24,6 +27,7 @@ fix_permission = {
     "system_ext/lib*": "u:object_r:system_lib_file:s0",
     "/product/lib*": "u:object_r:system_lib_file:s0",
     "/odm/app/*": "u:object_r:vendor_app_file:s0",
+    "/odm/app/": "u:object_r:vendor_app_file:s0",
     "/odm/etc*": "u:object_r:vendor_configs_file:s0",
     "/vendor/apex*": "u:object_r:vendor_apex_file:s0",
     "/vendor/app/*": "u:object_r:vendor_app_file:s0",
@@ -44,8 +48,8 @@ fix_permission = {
 }
 
 
-def scan_context(file) -> dict:  # 读取context文件返回一个字典
-    context = {}
+def scan_context(file: str) -> Context:  # 读取context文件返回一个字典
+    context: Context = {}
     with open(file, "r", encoding="utf-8") as file_:
         for i in file_.readlines():
             filepath, *other = i.strip().split()
@@ -57,7 +61,7 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
     return context
 
 
-def scan_dir(folder) -> Generator[Any, Any, Any]:  # 读取解包的目录，返回一个生成器
+def scan_dir(folder: str) -> Generator[Union[str, None], Any, Any]:  # 读取解包的目录，返回一个生成器
     part_name = os.path.basename(folder)
     allfiles = [
         "/",
@@ -77,45 +81,51 @@ def scan_dir(folder) -> Generator[Any, Any, Any]:  # 读取解包的目录，返
             )
         for rv in allfiles:
             yield rv
+    yield None
 
 
 def str_to_selinux(string: str):
     return escape(string).replace("\\-", "-")
 
 
-def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
-    new_fs = {}
-    # 定义已修补过的 避免重复修补
-    r_new_fs = {}
+def context_patch(fs_file: Context, dir_path: str) -> tuple[Context, int]:  # 接收两个字典对比
+    new_fs: Context = {}
+    r_new_fs: Context = {}
     add_new = 0
+
     print("ContextPatcher: Load origin %d" % (len(fs_file.keys())) + " entries")
-    # 定义默认 SeLinux 标签
-    if dir_path.endswith("system_dlkm"):
-        permission_d = ["u:object_r:system_dlkm_file:s0"]
-    elif dir_path.endswith(("odm", "vendor", "vendor_dlkm")):
-        permission_d = ["u:object_r:vendor_file:s0"]
-    else:
-        permission_d = ["u:object_r:system_file:s0"]
+
+    permission_d = {
+        "system_dlkm": ["u:object_r:system_dlkm_file:s0"],
+        "odm": ["u:object_r:vendor_file:s0"],
+        "vendor": ["u:object_r:vendor_file:s0"],
+        "vendor_dlkm": ["u:object_r:vendor_file:s0"],
+    }.get(os.path.basename(dir_path), ["u:object_r:system_file:s0"])
+
     for i in scan_dir(os.path.abspath(dir_path)):
-        # 把不可打印字符替换为 *
+        if i is None:
+            continue
+
         if not i.isprintable():
             tmp = ""
             for c in i:
                 tmp += c if c.isprintable() else "*"
             i = tmp
+
         if " " in i:
             i = i.replace(" ", "*")
+
         i = str_to_selinux(i)
+
         if fs_file.get(i):
-            # 如果已经存在, 直接使用原来的
             new_fs[i] = fs_file[i]
         else:
             permission = None
-            # 确认 i 不为空
+
             if r_new_fs.get(i):
                 continue
+
             if i:
-                # 如果路径符合已定义的内容, 直接将 permission 赋值为对应的值
                 for f in fix_permission.keys():
                     pattern = f.replace("*", ".*")
                     if i == pattern:
@@ -124,7 +134,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
                     if match(pattern, i):
                         permission = [fix_permission[f]]
                         break
-                # 如果路径不符合已定义的内容, 尝试从 fs_file 中查找相似的路径
+
                 if not permission:
                     for e in fs_file.keys():
                         if (
@@ -139,8 +149,10 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
                             break
                         else:
                             permission = permission_d
+
             if " " in permission:
                 permission = permission.replace(" ", "")
+
             print(f"Add {i} {permission}")
             add_new += 1
             r_new_fs[i] = permission
@@ -148,7 +160,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     return new_fs, add_new
 
 
-def main(dir_path, fs_config) -> None:
+def main(dir_path: str, fs_config: str) -> None:
     new_fs, add_new = context_patch(scan_context(os.path.abspath(fs_config)), dir_path)
     with open(fs_config, "w+", encoding="utf-8", newline="\n") as f:
         f.writelines(
