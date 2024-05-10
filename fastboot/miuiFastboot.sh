@@ -7,7 +7,6 @@ set -o pipefail
 url="$1"
 github_workspace="$2"
 device="$3"
-key="$4"
 
 RED='\033[1;31m'
 YELLOW='\033[1;33m'
@@ -19,19 +18,19 @@ color_blue='\033[1;34m'
 color_green='\033[1;32m'
 
 # Download package
-echo -e "${color_red}- Downloading package"
-aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "${github_workspace}" -o "recovery_rom.zip" "${url}"
-echo -e "${color_red}- Downloaded recovery rom"
+echo -e "${BLUE}- Downloading package"
+aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -d "${github_workspace}" -o "recovery_rom.zip" "${url}"
+echo -e "${GREEN}- Downloaded recovery rom"
 
 # Set permissions and create directories
-sudo chmod -R 777 "${github_workspace}/tools"
+sudo chmod -R +rwx "${github_workspace}/tools"
 mkdir -p "${github_workspace}/${device}"
 mkdir -p "${github_workspace}/super_maker/config"
 mkdir -p "${github_workspace}/zip"
 
 # Extract payload.bin
 echo -e "${YELLOW}- extracting payload.bin"
-RECOVERY_ZIP="recovery_rom.zip"
+recovery_zip="recovery_rom.zip"
 7z x "${github_workspace}/${recovery_zip}" -o"${github_workspace}/${device}" payload.bin || true
 rm -rf "${github_workspace:?}/${recovery_zip}"
 echo -e "${BLUE}- extracted payload.bin"
