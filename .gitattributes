@@ -1,6 +1,25 @@
+#!/bin/bash
+
+# Change to the correct directory
 cd /home/runner/work/xaga_miui_base-builder/xaga_miui_base-builder/zip
-git filter-branch --tree-filter 'rm -f xaga_fastboot.zip' HEAD
-git update-index --chmod=+x xaga_fastboot.sh
+
+# Remove xaga_fastboot.zip file
+rm -f xaga_fastboot.zip
+
+# Make xaga_fastboot.sh executable
+chmod +x xaga_fastboot.sh
+
+# Add the modified file to the staging area
 git add xaga_fastboot.sh
+
+# Commit the changes with a meaningful message
 git commit -m "Remove xaga_fastboot.zip and make xaga_fastboot.sh executable"
+
+# Filter the branch to only include the xaga_fastboot subdirectory
 git filter-branch --prune-empty --subdirectory-filter xaga_fastboot HEAD
+
+# Clean up the Git repository
+git for-each-ref --format="%(refname)" refs/original/ | xargs -n 1 git update-ref -d
+rm -rf .git/refs/original/
+git reflog expire --expire=now --all
+git gc --prune=now
