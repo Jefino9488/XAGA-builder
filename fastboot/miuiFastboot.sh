@@ -97,7 +97,7 @@ mkdir -p "${github_workspace}/zip"
 
 # Patch boot image
 echo -e "${YELLOW}- patching boot image"
-cp "${github_workspace}/${device}/images/boot.img" "${github_workspace}/${DEVICE}/boot/"
+cp "${github_workspace}/${device}/images/boot.img" "${github_workspace}/${device}/boot/"
 chmod +x "${MAGISK_PATCH}"
 ${MAGISK_PATCH} "${github_workspace}/${device}/boot/boot.img"
 if [ $? -ne 0 ]; then
