@@ -1,1 +1,6 @@
-/home/runner/work/xaga_miui_base-builder/xaga_miui_base-builder/zip/xaga_fastboot.zip filter=lfs diff=lfs merge=lfs -text
+cd /home/runner/work/xaga_miui_base-builder/xaga_miui_base-builder/zip
+git filter-branch --tree-filter 'rm -f xaga_fastboot.zip' HEAD
+git update-index --chmod=+x xaga_fastboot.sh
+git add xaga_fastboot.sh
+git commit -m "Remove xaga_fastboot.zip and make xaga_fastboot.sh executable"
+git filter-branch --prune-empty --subdirectory-filter xaga_fastboot HEAD
