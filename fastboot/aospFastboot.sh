@@ -44,7 +44,7 @@ echo -e "${BLUE}- extracted images"
 echo -e "${YELLOW}- moving images to super_maker"
 for IMAGE in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
     mv -t "${GITHUB_WORKSPACE}/super_maker" "${GITHUB_WORKSPACE}/${DEVICE}/images/$IMAGE.img" || exit
-    eval "${IMAGE}_SIZE=\$(du -b \"${GITHUB_WORKSPACE}/super_maker/$IMAGE.img\" | awk '{print \$1}')"
+    eval "${IMAGE}_size=\$(du -b \"${GITHUB_WORKSPACE}/super_maker/$IMAGE.img\" | awk '{print \$1}')"
     echo -e "${BLUE}- moved $IMAGE"
 done
 
