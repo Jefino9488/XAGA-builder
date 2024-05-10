@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/bash -l
+
+set -e
 
 URL="$1"
 GITHUB_WORKSPACE="$2"
@@ -10,13 +12,16 @@ YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
 GREEN='\033[1;32m'
 
+trap 'rm -rf "${TMPDIR}"' EXIT
+TMPDIR=$(mktemp -d)
+
 # Download recovery rom
 echo -e "${BLUE}- Starting downloading recovery rom"
 aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -d "${GITHUB_WORKSPACE}" -o "recovery_rom.zip" "${URL}"
 echo -e "${GREEN}- Downloaded recovery rom"
 
 # Set permissions and create directories
-sudo chmod -R 777 "${GITHUB_WORKSPACE}/tools"
+sudo chmod -R +rwx "${GITHUB_WORKSPACE}/tools"
 mkdir -p "${GITHUB_WORKSPACE}/${DEVICE}"
 mkdir -p "${GITHUB_WORKSPACE}/super_maker/config"
 mkdir -p "${GITHUB_WORKSPACE}/zip"
@@ -24,7 +29,7 @@ mkdir -p "${GITHUB_WORKSPACE}/zip"
 # Extract payload.bin
 echo -e "${YELLOW}- extracting payload.bin"
 RECOVERY_ZIP="recovery_rom.zip"
-7z x "${GITHUB_WORKSPACE}/${RECOVERY_ZIP}" -o"${GITHUB_WORKSPACE}/${DEVICE}" payload.bin
+7z x "${GITHUB_WORKSPACE}/${RECOVERY_ZIP}" -o"${GITHUB_WORKSPACE}/${DEVICE}" payload.bin || true
 rm -rf "${GITHUB_WORKSPACE:?}/${RECOVERY_ZIP}"
 echo -e "${BLUE}- extracted payload.bin"
 
@@ -38,8 +43,8 @@ echo -e "${BLUE}- extracted images"
 # Move images to the super_maker directory
 echo -e "${YELLOW}- moving images to super_maker"
 for IMAGE in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
-    mv "${GITHUB_WORKSPACE}/${DEVICE}/images/$IMAGE.img" "${GITHUB_WORKSPACE}/super_maker/"
-    eval "${IMAGE}_SIZE=\$(du -sb \"${GITHUB_WORKSPACE}/super_maker/$IMAGE.img\" | awk {'print \$1'})"
+    mv -t "${GITHUB_WORKSPACE}/super_maker" "${GITHUB_WORKSPACE}/${DEVICE}/images/$IMAGE.img" || exit
+    eval "${IMAGE}_SIZE=\$(du -b \"${GITHUB_WORKSPACE}/super_maker/$IMAGE.img\" | awk '{print \$1}')"
     echo -e "${BLUE}- moved $IMAGE"
 done
 
@@ -75,21 +80,12 @@ echo -e "${YELLOW}- creating super image"
     --partition odm_b:readonly:0:main_b \
     --partition vendor_dlkm_a:readonly:"${vendor_dlkm_size}":main_a --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
     --partition vendor_dlkm_b:readonly:0:main_b \
-    --virtual-ab --sparse --output "${GITHUB_WORKSPACE}/super_maker/super.img"
-
-if [ $? -ne 0 ]; then
-    echo -e "${RED}- failed to create super image"
-    exit 1
-fi
+    --virtual-ab --sparse --output "${GITHUB_WORKSPACE}/super_maker/super.img" || exit
 echo -e "${BLUE}- created super image"
 
 # Move super image to the images directory
 echo -e "${YELLOW}- moving super image"
-mv "${GITHUB_WORKSPACE}/super_maker/super.img" "${GITHUB_WORKSPACE}/${DEVICE}/images/"
-if [ $? -ne 0 ]; then
-    echo -e "${RED}- failed to move super image"
-    exit 1
-fi
+mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${GITHUB_WORKSPACE}/super_maker/super.img" || exit
 echo -e "${BLUE}- moved super image"
 
 # Create device working directory
@@ -101,7 +97,7 @@ mkdir -p "${GITHUB_WORKSPACE}/zip"
 # Patch boot image
 echo -e "${YELLOW}- patching boot image"
 cp "${GITHUB_WORKSPACE}/${DEVICE}/images/boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/boot/"
-chmod +x "${GITHUB_WORKSPACE}/magisk"
+chmod +x "${MAGISK_PATCH}"
 ${MAGISK_PATCH} "${GITHUB_WORKSPACE}/${DEVICE}/boot/boot.img"
 if [ $? -ne 0 ]; then
     echo -e "${RED}- failed to patch boot image"
@@ -122,5 +118,5 @@ echo -e "${BLUE}- created ${DEVICE} working directory"
 
 # Zip fastboot files
 echo -e "${YELLOW}- ziping fastboot files"
-zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}"
+zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}" || true
 echo -e "${GREEN}- ${DEVICE}_fastboot.zip created successfully"
