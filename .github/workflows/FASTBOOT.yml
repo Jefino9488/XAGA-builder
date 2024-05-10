@@ -65,7 +65,7 @@ jobs:
              echo "device=$device_name" >> $GITHUB_ENV
              echo "Device name: $device_name"
              echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
-             sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device_name }}
+             sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device }}
           else
              sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ github.event.inputs.Name }}
           fi
