@@ -46,7 +46,7 @@ jobs:
 
       - name: prepareTheRequiredEnvironment
         env:
-          device_name: ${{ github.event.inputs.Name }}
+
           rom_type: ${{ github.event.inputs.ROM_TYPE }}
         run: |
           sudo apt-get install python3 aria2 p7zip-full zstd dos2unix
@@ -54,9 +54,14 @@ jobs:
       - name: Build ROM
         run: |
           if [ "${{ env.rom_type }}" == "MIUI" ]; then
-            sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device_name }}
+             URL="${{ github.event.inputs.URL }}"
+             device_name=$(basename "$URL" | cut -d'_' -f2 | cut -d'.' -f2)
+             echo "device=$device_name" >> $GITHUB_ENV
+             echo "Device name: $device_name"
+             echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
+             sudo bash "$GITHUB_WORKSPACE"/fastboot/miuiFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device_name }}
           else
-            sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ env.device_name }}
+             sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh ${{ github.event.inputs.URL }} $GITHUB_WORKSPACE ${{ github.event.inputs.Name }}
           fi
           if [ $? -ne 0 ]; then
             echo "Error: Build failed. Exiting workflow."
@@ -66,12 +71,65 @@ jobs:
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
+          
           cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
           chmod +w "$GITHUB_WORKSPACE/GithubRelease"
           threshold_size=$((1850 * 1024 * 1024))
-          file_size=$(stat --printf="%s" "$GITHUB_WORKSPACE/zip/${{ env.device_name }}_fastboot.zip")
-          if [ "$file_size" -gt "$threshold_size" ]; then
-            cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
-            split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device_name }}_fastboot.
+          file_size=$(stat --printf="%s" "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip")
+           if [ "$file_size" -gt "$threshold_size" ]; then
+              cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
+              split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.device }}_fastboot-split.zip"
+              cd "$GITHUB_WORKSPACE"
+          else
+              echo "File size is less than or equal to 1850MB. No need to split."
+              cp "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease"
+          fi
+          cd "$GITHUB_WORKSPACE"
+          touch file.log
+          echo -e "# ${device}_fastboot.zip\n" >> file.log
+          echo -e "## Fastboot version: ${{ env.device }}" > file.log
+          echo -e "This archive contains the Fastboot images for the device XAGA.\n" >> file.log
+          echo -e "## Contents\n" >> file.log
+          echo "- **images/**: Contains partition images." >> file.log
+          echo "- **boot/**: Includes the boot image." >> file.log
+          echo "- **vendor_boot/**: Holds the vendor_boot image." >> file.log
+          echo "- **flasher.exe**: Flasher tool for the device." >> file.log
+          echo -e "\n## Flashing Instructions\n" >> file.log
+          echo "1. Download the zip(if available and skip 2 else folow)." >> file.log
+          echo "2. Download all splits and run the `merge.bat` to merge." >> file.log
+          echo "3. Extract the contents of merged archive to a convenient location." >> file.log
+          echo "4. Follow the flashing instructions provided by the flasher.exe." >> file.log
+          echo -e "\n## Notes\n" >> file.log
+          echo "- Ensure that you have the necessary tools and drivers installed before proceeding with the flashing process." >> file.log
+          echo "- For more details, refer to the device's official documentation." >> file.log
+        
+      
+
+      - name: Create and Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{ github.workspace }}/GithubRelease/*
+          name: "${{ env.device }}_fastboot"
+          tag: "${{ env.device }}"
+          artifactErrorsFailBuild: true
+          allowUpdates: true
+          makeLatest: true
+          bodyFile: "${{ github.workspace }}/file.log"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  notification:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    if: always()
+    steps:
+      - uses: martialonline/workflow-status@v3
+        id: check
+      - run: echo "Workflow failed"
+        if: steps.check.outputs.status == 'failure'
+      - run: echo "Workflow was cancelled"
+        if: steps.check.outputs.status == 'cancelled'
+      - run: echo "Workflow was successful"
+        if: steps.check.outputs.status == 'success'
