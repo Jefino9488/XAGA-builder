@@ -7,10 +7,6 @@ on:
         description: recovery rom direct link
         required: true
 
-      Name:
-        description: output name for the zip
-        required: true
-
       ROM_TYPE:
         description: Select ROM type
         type: choice
@@ -18,6 +14,10 @@ on:
         options:
           - MIUI
           - AOSP
+
+      Name:
+        description: output name for the zip
+        required: false
 
 jobs:
   build:
