@@ -91,7 +91,7 @@ jobs:
               cd "$GITHUB_WORKSPACE"
           else
               echo "File size is less than or equal to 1850MB. No need to split."
-              cp "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease"
+              cp "$GITHUB_WORKSPACE/zip/${{ env.version }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease"
           fi
           cd "$GITHUB_WORKSPACE"
           touch file.log
@@ -118,8 +118,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
-          name: "${{ env.device }}_fastboot"
-          tag: "${{ env.device }}"
+          name: "${{ env.version }}_fastboot"
+          tag: "${{ env.version }}"
           artifactErrorsFailBuild: true
           allowUpdates: true
           makeLatest: true
