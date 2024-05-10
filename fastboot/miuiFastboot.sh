@@ -15,9 +15,9 @@ color_blue='\033[1;34m'
 color_green='\033[1;32m'
 
 # Download package
-echo -e "${color_red}- Downloading package${color_normal}"
+echo -e "${color_red}- Downloading package"
 aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "${github_workspace}" -o "recovery_rom.zip" "${url}"
-echo -e "${color_red}- Downloaded recovery rom${color_normal}"
+echo -e "${color_red}- Downloaded recovery rom"
 
 # Set permissions and create directories
 sudo chmod -R 777 "${github_workspace}/tools"
@@ -74,15 +74,15 @@ mkdir -p "${github_workspace}/zip"
 # Patch boot image
 magisk_patch="${github_workspace}/magisk/boot_patch.sh"
 
-echo -e "${color_yellow}- patching boot image${color_normal}"
+echo -e "${color_yellow}- patching boot image"
 cp "${github_workspace}/${device}/images/boot.img" "${github_workspace}/${device}/boot/"
 
 chmod +x "${github_workspace}/magisk"
 
 if "${magisk_patch}" "${github_workspace}/${device}/boot/boot.img"; then
-    echo -e "${color_blue}- patched boot image${color_normal}"
+    echo -e "${color_blue}- patched boot image"
 else
-    echo -e "${color_red}- failed to patch boot image${color_normal}"
+    echo -e "${color_red}- failed to patch boot image"
     exit 1
 fi
 
@@ -99,13 +99,13 @@ cp "${github_workspace}/tools/flasher.exe" "${github_workspace}/${device}/"
 # Copy preloader_ari.bin to images directory
 if [ -f "${github_workspace}/tools/preloader_ari.bin" ]; then
     cp "${github_workspace}/tools/preloader_ari.bin" "${github_workspace}/${device}/images/"
-    echo -e "${color_green}preloader_ari.bin copied successfully${color_normal}"
+    echo -e "${color_green}preloader_ari.bin copied successfully"
 else
-    echo -e "${color_red}Failed to copy preloader_ari.bin${color_normal}"
+    echo -e "${color_red}Failed to copy preloader_ari.bin"
 fi
 
 # Create zip file
 cd "${github_workspace}" || exit
 zip -r "${github_workspace}/zip/${device}_fastboot.zip" "${device}"
 
-echo -e "${color_green}- ${device}_fastboot.zip created successfully${color_normal}"
+echo -e "${color_green}- ${device}_fastboot.zip created successfully"
