@@ -79,7 +79,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.TOKEN}`
+                'Authorization': `Bearer ${GITHUB_TOKEN}`
             },
             body: JSON.stringify({
                 ref: 'fastboot',
