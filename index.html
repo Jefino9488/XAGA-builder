@@ -58,37 +58,42 @@
     </form>
 
     <script>
+    const repoOwner = 'Jefino9488';
+    const repoName = 'XAGA-builder';
+    const workflowId = 'FASTBOOT.yml';
     const form = document.getElementById('fastboot-form');
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const urlInput = document.getElementById('url-input');
-    const romTypeSelect = document.getElementById('rom-type-select');
-    const nameInput = document.getElementById('name-input');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const urlInput = document.getElementById('url-input');
+        const romTypeSelect = document.getElementById('rom-type-select');
+        const nameInput = document.getElementById('name-input');
 
-    const inputs = {
-        URL: urlInput.value,
-        ROM_TYPE: romTypeSelect.value,
-        Name: nameInput.value
-    };
+        const inputs = {
+            URL: urlInput.value,
+            ROM_TYPE: romTypeSelect.value,
+            Name: nameInput.value
+        };
 
-    const response = await fetch(`https://api.github.com/repos/Jefino9488/XAGA-builder/actions/workflows/FASTBOOT.yml/dispatches`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`
-        },
-        body: JSON.stringify({
-            inputs
-        })
+        const GITHUB_TOKEN = '${{ secrets.GITHUB_TOKEN }}';
+        const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/actions/workflows/${workflowId}/dispatches`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GITHUB_TOKEN}`
+            },
+            body: JSON.stringify({
+                ref: 'fastboot',
+                inputs
+            })
+        });
+
+        if (response.ok) {
+            console.log('GitHub Action triggered successfully!');
+        } else {
+            console.error('Error triggering GitHub Action:', response.status);
+        }
     });
-
-    if (response.ok) {
-        console.log('GitHub Action triggered successfully!');
-    } else {
-        console.error('Error triggering GitHub Action:', response.status);
-    }
-});
 </script>
 </body>
 </html>
