@@ -60,6 +60,7 @@
         const repoOwner = 'Jefino9488';
         const repoName = 'XAGA-builder';
         const workflowId = 'Fastboot';
+        const githubToken = await getGithubSecret('TOKEN');
         const form = document.getElementById('fastboot-form');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
