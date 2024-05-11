@@ -8,6 +8,8 @@ import { Octokit } from "https://esm.sh/octokit?dts";
             auth: process.env.TOKEN,
         });
 
+        console.log('Token:', process.env.TOKEN);
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const urlInput = document.getElementById('url-input');
