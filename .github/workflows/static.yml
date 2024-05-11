@@ -29,12 +29,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'latest'
-      - run: npm ci
-      - run: npm test
       - name: Run script
         run: |
           echo "Hello, world!"
