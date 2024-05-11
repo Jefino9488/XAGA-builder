@@ -30,10 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run script
+        run: |
+          echo "Hello, world!"
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          node .github/actions-scripts/use-the-api.mjs
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Pages
