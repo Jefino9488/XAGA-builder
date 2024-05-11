@@ -2,11 +2,10 @@ import { Octokit } from "https://esm.sh/octokit?dts";
 
         const repoOwner = 'Jefino9488';
         const repoName = 'XAGA-builder';
-        const githubToken = 'process.env.TOKEN';
         const workflowId = 'FASTBOOT.yml';
         const form = document.getElementById('fastboot-form');
         const octokit = new Octokit({
-            auth: githubToken
+            auth: process.env.TOKEN,
         });
 
         form.addEventListener('submit', async (e) => {

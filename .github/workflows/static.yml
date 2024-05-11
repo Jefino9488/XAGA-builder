@@ -29,8 +29,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: setup environment
-        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
+      - name: Run script
+        run: |
+          echo "Hello, world!"
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Pages
