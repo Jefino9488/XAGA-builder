@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: setup environment
-        run: echo "TOKEN=$TOKEN" >> $GITHUB_ENV
+        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Pages
