@@ -29,6 +29,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Run script
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node .github/actions-scripts/use-the-api.mjs
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Pages
