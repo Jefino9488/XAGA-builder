@@ -64,9 +64,9 @@
         const romTypeSelect = document.getElementById('rom-type-select');
         const nameInput = document.getElementById('name-input');
         const githubToken = await getGithubSecret('GITHUB_TOKEN');
-        const repoOwner = await getGithubSecret('Jefino9488');
-        const repoName = await getGithubSecret('XAGA-builder');
-        const workflowId = await getGithubSecret('Fastboot');
+        const repoOwner = 'Jefino9488';
+        const repoName = 'XAGA-builder';
+        const workflowId = 'Fastboot';
 
         const headers = {
             'Authorization': `Bearer ${githubToken}`,
