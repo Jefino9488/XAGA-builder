@@ -110,6 +110,7 @@
 
             if (response.ok) {
                 const secret = await response.json();
+                console.log('GitHub Secret retrieved successfully!');
                 return secret.encrypted_value;
             } else {
                 console.error('Error retrieving GitHub Secret:', response.status);
