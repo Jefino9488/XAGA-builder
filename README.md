@@ -1,8 +1,15 @@
-# XAGA-`builder`
+# 🚀 Welcome to your new awesome project!
 
+This project has been created using **webpack-cli**, you can now run
 
-## Status
-![Fastboot](https://github.com/Jefino9488/XAGA-builder/workflows/Fastboot/badge.svg)
+```
+npm run build
+```
 
-## Usage
+or
 
+```
+yarn build
+```
+
+to bundle your application
