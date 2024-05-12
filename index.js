@@ -1,6 +1,4 @@
 import { Octokit } from "https://esm.sh/octokit?dts";
-require('dotenv').config();
-
 
         const repoOwner = 'Jefino9488';
         const repoName = 'XAGA-builder';
