@@ -22,7 +22,6 @@ const App = () => {
     e.preventDefault();
 
     try {
-      console.log(import.meta.env.VITE_GITHUB_TOKEN)
       const response = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
         owner: REPO_OWNER,
         repo: REPO_NAME,
