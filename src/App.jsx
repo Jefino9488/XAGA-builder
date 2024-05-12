@@ -35,7 +35,7 @@ const App = () => {
       });
 
       if (response.status === 204) {
-        console.log('GitHub Action triggered successfully!');
+        console.log('GitHub Action triggered successfully');
       } else {
         console.error('Error triggering GitHub Action:', response.status);
       }
