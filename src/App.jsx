@@ -8,7 +8,6 @@ const App = () => {
   const [romType, setRomType] = useState('');
   const [name, setName] = useState('');
   const formRef = useRef(null);
-
   const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
   const REPO_OWNER = 'Jefino9488';
   const REPO_NAME = 'XAGA-builder';
@@ -35,7 +34,7 @@ const App = () => {
       });
 
       if (response.status === 204) {
-        console.log('GitHub Action triggered successfully');
+        console.log('GitHub Action triggered success');
       } else {
         console.error('Error triggering GitHub Action:', response.status);
       }
