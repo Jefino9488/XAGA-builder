@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: github token
+        run:
+            token=${{ secrets.GITHUB_TOKEN }}
+            echo "GITHUB_TOKEN=token" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout repo
         uses: actions/checkout@v3
 
@@ -36,6 +42,12 @@ jobs:
     if: github.ref == 'refs/heads/fastboot'
 
     steps:
+      - name: github token
+        run:
+          token=${{ secrets.GITHUB_TOKEN }}
+          echo "GITHUB_TOKEN=token" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
