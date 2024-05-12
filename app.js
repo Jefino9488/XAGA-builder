@@ -1,4 +1,4 @@
-import { Octokit } from 'https://cdn.skypack.dev/@octokit/rest';
+import { Octokit } from "https://esm.sh/@octokit/core";
 document.addEventListener('DOMContentLoaded', async () => {
   const form = document.getElementById('fastboot-form');
   const urlInput = document.getElementById('url-input');
