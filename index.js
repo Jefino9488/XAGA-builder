@@ -1,6 +1,5 @@
 import { Octokit } from "https://esm.sh/octokit?dts";
 require('dotenv').config();
-require('webpack.config.js');
 
 
         const repoOwner = 'Jefino9488';
