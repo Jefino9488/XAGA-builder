@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const workflowId = 'Fastboot';
 
     const headers = {
-      'Authorization': `Bearer ${githubToken}`,
+      'Authorization': `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
       'Content-Type': 'application/json'
     };
 
