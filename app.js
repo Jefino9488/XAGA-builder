@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const romTypeSelect = document.getElementById('rom-type-select');
   const nameInput = document.getElementById('name-input');
 
-  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+  const GITHUB_TOKEN = '${import.meta.env.VITE_GITHUB_TOKEN}';
   const REPO_OWNER = 'Jefino9488';
   const REPO_NAME = 'XAGA-builder';
   const WORKFLOW_ID = 'FASTBOOT.yml';
