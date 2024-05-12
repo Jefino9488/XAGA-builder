@@ -22,7 +22,7 @@ concurrency:
 
 env:
   # Environment variable to set the build directory
-  VITE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  VITE_GITHUB_TOKEN: ${{ secrets.VITE_GITHUB_TOKEN }}
 
 jobs:
   # Single deploy job since we're just deploying
