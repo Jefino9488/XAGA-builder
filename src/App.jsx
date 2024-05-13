@@ -57,7 +57,7 @@ const App = () => {
   return (
       <div id="root">
         <h1 id="h">Build Fastboot ROM</h1>
-        <p>Fill in the required fields to build a Fastboot ROM.</p>
+        <br/>
         <form ref={formRef} onSubmit={handleSubmit}>
           <h2>Recovery ROM Details</h2>
           <label htmlFor="url-input">Recovery ROM direct link:</label>
@@ -76,7 +76,7 @@ const App = () => {
 
           <button type="submit">Build Fastboot</button>
         </form>
-        <p>All builds are available on the releases page.</p>
+        <p>All builds are available on the releases page</p>
         <div id="root1">
           <button onClick={handleRedirect}>Go to releases</button>
           <button onClick={handleRedirectbuild}>Build Status</button>
