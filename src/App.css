@@ -45,7 +45,7 @@ input[type="url"] {
   border-radius: 10px;
 }
 select {
-    width: 35%;
+  width: max-content;
   padding: 10px;
   margin: 10px;
   border: 1px solid #ccc;
