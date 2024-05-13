@@ -56,7 +56,7 @@ const App = () => {
 
   return (
       <div id="root">
-        <h1>Build Fastboot ROM</h1>
+        <h1 id="h">Build Fastboot ROM</h1>
         <p>Fill in the required fields to build a Fastboot ROM.</p>
         <form ref={formRef} onSubmit={handleSubmit}>
           <h2>Recovery ROM Details</h2>
