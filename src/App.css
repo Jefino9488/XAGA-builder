@@ -37,21 +37,21 @@ label {
   margin-bottom: 10px;
 }
 
-input[type="url"], select {
+input[type="url"] {
   width: 80%;
   padding: 10px;
   margin: 10px;
   border: 1px solid #ccc;
   border-radius: 10px;
 }
-input[type="text"], select {
-  width: 80%;
+select {
+  width: px;
   padding: 10px;
   margin: 10px;
   border: 1px solid #ccc;
   border-radius: 10px;
 }
-input[type="name"], select {
+input[type="name"] {
   width: 80%;
   padding: 10px;
   margin: 10px;
