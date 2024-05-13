@@ -34,7 +34,7 @@ const App = () => {
       });
 
       if (response.status === 204) {
-        console.log('GitHub Action triggered finaly!');
+        console.log('GitHub Action triggered finally!');
       } else {
         console.error('Error triggering GitHub Action:', response.status);
       }
@@ -44,23 +44,28 @@ const App = () => {
   };
 
   return (
-    <div>
-      <form ref={formRef} onSubmit={handleSubmit}>
-        <label htmlFor="url-input">Recovery ROM direct link:</label>
-        <input type="text" id="url-input" value={url} onChange={(e) => setUrl(e.target.value)} required />
+  <div id="root">
+    <h1>Build Fastboot ROM</h1>
+    <p>Fill in the required fields to build a Fastboot ROM.</p>
 
-        <label htmlFor="rom-type-select">Select ROM type:</label>
-        <select id="rom-type-select" value={romType} onChange={(e) => setRomType(e.target.value)} required>
-          <option value="MIUI">MIUI</option>
-          <option value="AOSP">AOSP</option>
-        </select>
+    <form ref={formRef} onSubmit={handleSubmit}>
+      <h2>Recovery ROM Details</h2>
+      <label htmlFor="url-input">Recovery ROM direct link:</label>
+      <input type="url" id="url-input" value={url} onChange={(e) => setUrl(e.target.value)} required />
 
-        <label htmlFor="name-input">Output name for the zip (optional):</label>
-        <input type="text" id="name-input" value={name} onChange={(e) => setName(e.target.value)} />
+      <label htmlFor="rom-type-select">Select ROM type:</label>
+      <select id="rom-type-select" value={romType} onChange={(e) => setRomType(e.target.value)} required>
+        <option value="MIUI">MIUI</option>
+        <option value="AOSP">AOSP</option>
+      </select>
 
-        <button type="submit">Build Fastboot</button>
-      </form>
-    </div>
+      <h2>Output Settings</h2>
+      <label htmlFor="name-input">Output name for the zip ({romType === 'AOSP' ? 'required' : 'optional'}):</label>
+      <input type="name" id="name-input" value={name} onChange={(e) => setName(e.target.value)} required={romType === 'AOSP'} />
+
+      <button type="submit">Build Fastboot</button>
+    </form>
+  </div>
   );
 };
 
