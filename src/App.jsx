@@ -65,6 +65,7 @@ const App = () => {
 
           <label htmlFor="rom-type-select">Select ROM type:</label>
           <select id="rom-type-select" value={romType} onChange={(e) => setRomType(e.target.value)} required>
+            <option value="">select</option>
             <option value="MIUI">MIUI</option>
             <option value="AOSP">AOSP</option>
           </select>
