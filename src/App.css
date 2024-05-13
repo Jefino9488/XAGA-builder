@@ -45,11 +45,12 @@ input[type="url"] {
   border-radius: 10px;
 }
 select {
-  width: px;
+    width: 35%;
   padding: 10px;
   margin: 10px;
   border: 1px solid #ccc;
   border-radius: 10px;
+  -webkit-appearance: none;
 }
 input[type="name"] {
   width: 80%;
