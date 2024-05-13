@@ -34,7 +34,7 @@ const App = () => {
       });
 
       if (response.status === 204) {
-        window.alert('Build started!');
+        window.alert('Build started! wait for 10 - 15 minutes and check the releases page.');
         setUrl('');
         setRomType('');
         setName('');
