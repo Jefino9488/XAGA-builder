@@ -50,34 +50,39 @@ const App = () => {
     window.open('https://github.com/Jefino9488/XAGA-builder/releases', '_blank');
   };
 
+  const handleRedirectbuild = () => {
+    window.open('https://github.com/Jefino9488/XAGA-builder/actions/workflows/FASTBOOT.yml', '_blank');
+  };
+
   return (
-    <div id="root">
-      <h1>Build Fastboot ROM</h1>
-      <p>Fill in the required fields to build a Fastboot ROM.</p>
+      <div id="root">
+        <h1>Build Fastboot ROM</h1>
+        <p>Fill in the required fields to build a Fastboot ROM.</p>
+        <form ref={formRef} onSubmit={handleSubmit}>
+          <h2>Recovery ROM Details</h2>
+          <label htmlFor="url-input">Recovery ROM direct link:</label>
+          <input type="url" id="url-input" value={url} onChange={(e) => setUrl(e.target.value)} required/>
 
-      <form ref={formRef} onSubmit={handleSubmit}>
-        <h2>Recovery ROM Details</h2>
-        <label htmlFor="url-input">Recovery ROM direct link:</label>
-        <input type="url" id="url-input" value={url} onChange={(e) => setUrl(e.target.value)} required />
+          <label htmlFor="rom-type-select">Select ROM type:</label>
+          <select id="rom-type-select" value={romType} onChange={(e) => setRomType(e.target.value)} required>
+            <option value="">Select ROM Type</option>
+            <option value="MIUI">MIUI</option>
+            <option value="AOSP">AOSP</option>
+          </select>
 
-        <label htmlFor="rom-type-select">Select ROM type:</label>
-        <select id="rom-type-select" value={romType} onChange={(e) => setRomType(e.target.value)} required>
-          <option value="">Select ROM Type</option> {/* Added a default empty option */}
-          <option value="MIUI">MIUI</option>
-          <option value="AOSP">AOSP</option>
-        </select>
+          <h2>Output Settings</h2>
+          <label htmlFor="name-input">Output name for the zip ({romType === 'AOSP' ? 'required' : 'optional'}):</label>
+          <input type="name" id="name-input" value={name} onChange={(e) => setName(e.target.value)}
+                 required={romType === 'AOSP'}/>
 
-        <h2>Output Settings</h2>
-        <label htmlFor="name-input">Output name for the zip ({romType === 'AOSP' ? 'required' : 'optional'}):</label>
-        <input type="name" id="name-input" value={name} onChange={(e) => setName(e.target.value)} required={romType === 'AOSP'} />
-
-        <button type="submit">Build Fastboot</button>
-      </form>
-
-      {/* Redirect button */}
-      <p>All builds are available on the releases page.</p>
-      <button onClick={handleRedirect}>Go to releases</button>
-    </div>
+          <button type="submit">Build Fastboot</button>
+        </form>
+        <p>All builds are available on the releases page.</p>
+        <div id="root1">
+          <button onClick={handleRedirect}>Go to releases</button>
+          <button onClick={handleRedirectbuild}>Build Status</button>
+        </div>
+      </div>
   );
 };
 
