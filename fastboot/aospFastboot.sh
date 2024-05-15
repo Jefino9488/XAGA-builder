@@ -118,10 +118,6 @@ mv "${GITHUB_WORKSPACE}/tools/flasher.exe" "${GITHUB_WORKSPACE}/${DEVICE}/"
 cd "${GITHUB_WORKSPACE}" || exit
 echo -e "${BLUE}- created ${DEVICE} working directory"
 
-# Upload files
-echo -e "${YELLOW}- uploading files"
-"${UPLOAD}" -f "${GITHUB_WORKSPACE}/${DEVICE}/boot/magisk_boot.img" -k "${KEY}"
-
 # Zip fastboot files
 echo -e "${YELLOW}- ziping fastboot files"
 zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}" || true

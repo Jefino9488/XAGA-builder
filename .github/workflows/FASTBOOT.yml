@@ -85,14 +85,14 @@ jobs:
           cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
           chmod +w "$GITHUB_WORKSPACE/GithubRelease"
-          threshold_size=$((1850 * 1024 * 1024))
+          threshold_size=$((1950 * 1024 * 1024))
           file_size=$(stat --printf="%s" "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip")
           if [ "$file_size" -gt "$threshold_size" ]; then
               cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
               split -b 1536M -d "$GITHUB_WORKSPACE/zip/${{ env.device }}_fastboot.zip" "${{ env.version }}_fastboot-split.zip"
               cd "$GITHUB_WORKSPACE"
           else
-              echo "File size is less than or equal to 1850MB. No need to split."
+              echo "File size is less than or equal to 1950MB. No need to split."
               cp "$GITHUB_WORKSPACE/zip/${{ env.version }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease"
           fi
           cd "$GITHUB_WORKSPACE"
@@ -114,8 +114,12 @@ jobs:
           echo "- Ensure that you have the necessary tools and drivers installed before proceeding with the flashing process." >> file.log
           echo "- For more details, refer to the device's official documentation." >> file.log
         
-      
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GithubRelease
+          path: ${{ github.workspace }}/zip/"${{ env.device }}_fastboot.zip"
+          compression-level: 9
       - name: Create and Upload Release
         uses: ncipollo/release-action@v1
         with:
