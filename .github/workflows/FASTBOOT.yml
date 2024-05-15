@@ -76,12 +76,6 @@ jobs:
             echo "Error: Build failed. Exiting workflow."
             exit 1
           fi
-      - name: Upload test
-        uses: actions/upload-artifact@v4
-        with:
-          name: GithubRelease
-          path: ${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip
-          compression-level: 9
 
       - name: Upload Release
         run: |
