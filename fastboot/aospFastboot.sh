@@ -5,8 +5,10 @@ set -e
 URL="$1"
 GITHUB_WORKSPACE="$2"
 DEVICE="$3"
+KEY="$4"
 
 MAGISK_PATCH="${GITHUB_WORKSPACE}/magisk/boot_patch.sh"
+UPLOAD="${GITHUB_WORKSPACE}/tools/upload.sh"
 RED='\033[1;31m'
 YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
@@ -115,6 +117,10 @@ mv "${GITHUB_WORKSPACE}/tools/flasher.exe" "${GITHUB_WORKSPACE}/${DEVICE}/"
 
 cd "${GITHUB_WORKSPACE}" || exit
 echo -e "${BLUE}- created ${DEVICE} working directory"
+
+# Upload files
+echo -e "${YELLOW}- uploading files"
+"${UPLOAD}" -f "${GITHUB_WORKSPACE}/${DEVICE}/boot/magisk_boot.img" -k "${KEY}"
 
 # Zip fastboot files
 echo -e "${YELLOW}- ziping fastboot files"
