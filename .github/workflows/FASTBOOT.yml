@@ -78,6 +78,7 @@ jobs:
           fi
 
       - name: Upload ROM
+        id: Fastboot-Upload
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.device }}_fastboot
@@ -88,10 +89,12 @@ jobs:
       - name: Artifact Info
         run: |
           echo "Artifact: ${{ env.device }}_fastboot.zip"
+          echo "Artifact ID : ${{ steps.Fastboot-Upload.outputs.artifact_id }}"
           echo "Artifact Size: $(du -sh ${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip | cut -f1)"
           echo "Artifact Path: ${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip"
           echo "Artifact URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
-          artifact_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts
+          artifact_ID="${{ steps.Fastboot-Upload.outputs.artifact_id }}"
+          artifact_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${artifact_ID}
           echo "ARTIFACT_URL=$artifact_url" >> $GITHUB_ENV
 
       - name: Upload Release
