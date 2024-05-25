@@ -14,8 +14,13 @@ on:
         options:
           - MIUI
           - AOSP
+
       Name:
         description: output name for the zip
+        required: false
+
+      FIRMWARE_URL:
+        description: firmware URL (for AOSP only)
         required: false
 
 jobs:
@@ -70,7 +75,7 @@ jobs:
             echo "Building AOSP Fastboot"
             echo "device=${{ github.event.inputs.Name }}" >> $GITHUB_ENV
             echo "version=$(echo ${{ github.event.inputs.Name }})" >> $GITHUB_ENV
-            sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh "${{ github.event.inputs.URL }}" $GITHUB_WORKSPACE "${{ github.event.inputs.Name }}" "${{ secrets.DEVUPLOAD }}"
+            sudo bash "$GITHUB_WORKSPACE"/fastboot/aospFastboot.sh "${{ github.event.inputs.URL }}" $GITHUB_WORKSPACE "${{ github.event.inputs.Name }}" "${{ secrets.DEVUPLOAD }}" "${{ github.event.inputs.FIRMWARE_URL }}"
           fi 
           if [ $? -ne 0 ]; then
             echo "Error: Build failed. Exiting workflow."
@@ -89,11 +94,9 @@ jobs:
       - name: Output Artifact ID
         run: echo 'Artifact ID is ${{ steps.Fastboot-Upload.outputs.artifact_id }}'
 
-
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
-          
           cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
