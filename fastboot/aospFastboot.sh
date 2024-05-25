@@ -96,6 +96,7 @@ create_super_image() {
 move_super_image() {
     echo -e "${YELLOW}- Moving super image"
     mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${GITHUB_WORKSPACE}/super_maker/super.img" || exit
+    sudo rm -rf "${GITHUB_WORKSPACE}/super_maker"  # Clean up super_maker directory
     echo -e "${BLUE}- Moved super image"
 }
 
@@ -121,16 +122,18 @@ patch_boot_image() {
 download_and_extract_firmware() {
     if [ -n "${FIRMWARE_URL}" ]; then
         echo -e "${BLUE}- Starting downloading firmware"
-        git clone --recurse-submodules https://github.com/AndroidDumps/Firmware_extractor.git "${TMPDIR}/Firmware_extractor"
+        mkdir -p "${TMPDIR}/Firmware_extractor"
         cd "${TMPDIR}/Firmware_extractor"
         wget "${FIRMWARE_URL}" -O firmware.zip
-        ./extractor.sh firmware.zip
+        unzip -o firmware.zip -d "${GITHUB_WORKSPACE}/${DEVICE}/images/"
+        sudo rm firmware.zip  # Clean up firmware zip after extraction
         echo -e "${GREEN}- Downloaded and extracted firmware"
 
         # Move extracted firmware images to the images folder
         mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${TMPDIR}/Firmware_extractor/out"/* || exit
         echo -e "${BLUE}- Moved extracted firmware images"
         cd "${GITHUB_WORKSPACE}"
+        sudo rm -rf "${TMPDIR}/Firmware_extractor"  # Clean up firmware extractor directory
     fi
 }
 
@@ -146,6 +149,8 @@ final_steps() {
     echo -e "${YELLOW}- Zipping fastboot files"
     zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}" || true
     echo -e "${GREEN}- ${DEVICE}_fastboot.zip created successfully"
+
+    sudo rm -rf "${GITHUB_WORKSPACE:?}/${DEVICE}"  # Clean up device directory
 }
 
 # Main Execution
