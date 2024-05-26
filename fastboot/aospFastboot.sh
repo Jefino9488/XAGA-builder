@@ -23,7 +23,7 @@ download_and_extract_firmware() {
         echo -e "${BLUE}- Starting downloading firmware"
         mkdir -p "${TMPDIR}/Firmware_extractor"
         cd "${TMPDIR}/Firmware_extractor"
-        wget "${FIRMWARE_URL}" -O firmware.zip
+        aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -o "firmware.zip" "${FIRMWARE_URL}"
         unzip -o firmware.zip -d "${TMPDIR}/Firmware_extractor/out"
         sudo rm firmware.zip  # Clean up firmware zip after extraction
         echo -e "${GREEN}- Downloaded and extracted firmware"
