@@ -15,24 +15,36 @@ YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
 GREEN='\033[1;32m'
 
-trap 'rm -rf "${TMPDIR}"' EXIT
-TMPDIR=$(mktemp -d)
+check_disk_space() {
+    local required_space_mb=5000  # Adjust this value as needed
+    local available_space_mb=$(df --output=avail -m "$GITHUB_WORKSPACE" | tail -1)
+
+    if (( available_space_mb < required_space_mb )); then
+        echo -e "${RED}- Error: Not enough disk space. Required: ${required_space_mb}MB, Available: ${available_space_mb}MB"
+        exit 1
+    fi
+}
 
 download_and_extract_firmware() {
     if [ -n "${FIRMWARE_URL}" ]; then
         echo -e "${BLUE}- Starting downloading firmware"
-        cd "${TMPDIR}"
+        cd "${GITHUB_WORKSPACE}"
         git clone --recurse-submodules https://github.com/AndroidDumps/Firmware_extractor.git
         cd Firmware_extractor
         aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -o "firmware.zip" "${FIRMWARE_URL}"
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}- Error: Failed to download firmware"
+            exit 1
+        fi
         ./extractor.sh firmware.zip
         echo -e "${GREEN}- Downloaded and extracted firmware"
 
         # Move extracted firmware images to the images folder
-        mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${TMPDIR}/Firmware_extractor/out"/* || exit
+        mkdir -p "${GITHUB_WORKSPACE}/${DEVICE}/images"
+        mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" out/* || exit
         echo -e "${BLUE}- Moved extracted firmware images"
         cd "${GITHUB_WORKSPACE}"
-        sudo rm -rf "${TMPDIR}/Firmware_extractor"  # Clean up firmware extractor directory
+        sudo rm -rf Firmware_extractor  # Clean up firmware extractor directory
     fi
 }
 
@@ -154,6 +166,7 @@ final_steps() {
 }
 
 # Main Execution
+check_disk_space
 download_and_extract_firmware  # New step to handle firmware extraction first
 download_recovery_rom
 set_permissions_and_create_dirs
