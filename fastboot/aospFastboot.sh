@@ -39,9 +39,16 @@ download_and_extract_firmware() {
         ./extractor.sh firmware.zip
         echo -e "${GREEN}- Downloaded and extracted firmware"
 
-        # Move extracted firmware images to the images folder
-        mkdir -p "${GITHUB_WORKSPACE}/${DEVICE}/images"
-        mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" out/* || exit
+        # Move extracted firmware images to the new firmware folder
+        mkdir -p "${GITHUB_WORKSPACE}/new_firmware"
+        if [ -d "out" ]; then
+            mv out/* "${GITHUB_WORKSPACE}/new_firmware/" || exit
+        elif [ -d "extracted" ]; then
+            mv extracted/* "${GITHUB_WORKSPACE}/new_firmware/" || exit
+        else
+            echo -e "${RED}- Error: No extracted files found"
+            exit 1
+        fi
         echo -e "${BLUE}- Moved extracted firmware images"
         cd "${GITHUB_WORKSPACE}"
         sudo rm -rf Firmware_extractor  # Clean up firmware extractor directory
@@ -155,6 +162,12 @@ final_steps() {
     mv "${GITHUB_WORKSPACE}/${DEVICE}/images/vendor_boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/vendor_boot/"
     mv "${GITHUB_WORKSPACE}/tools/flasher.exe" "${GITHUB_WORKSPACE}/${DEVICE}/"
 
+    # Move the new firmware images to the device's images folder before zipping
+    if [ -d "${GITHUB_WORKSPACE}/new_firmware" ]; then
+        mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${GITHUB_WORKSPACE}/new_firmware"/* || exit
+        sudo rm -rf "${GITHUB_WORKSPACE}/new_firmware"  # Clean up new firmware directory
+    fi
+
     cd "${GITHUB_WORKSPACE}" || exit
     echo -e "${BLUE}- Created ${DEVICE} working directory"
 
@@ -167,7 +180,7 @@ final_steps() {
 
 # Main Execution
 check_disk_space
-download_and_extract_firmware  # New step to handle firmware extraction first
+download_and_extract_firmware
 download_recovery_rom
 set_permissions_and_create_dirs
 extract_payload_bin
