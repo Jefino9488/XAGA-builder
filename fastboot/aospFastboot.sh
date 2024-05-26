@@ -21,12 +21,18 @@ TMPDIR=$(mktemp -d)
 download_and_extract_firmware() {
     if [ -n "${FIRMWARE_URL}" ]; then
         echo -e "${BLUE}- Starting downloading firmware"
-        mkdir -p "${TMPDIR}/Firmware_extractor"
-        cd "${TMPDIR}/Firmware_extractor"
+        cd "${TMPDIR}"
+        git clone --recurse-submodules https://github.com/AndroidDumps/Firmware_extractor.git
+        cd Firmware_extractor
         aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -o "firmware.zip" "${FIRMWARE_URL}"
-        unzip -o firmware.zip -d "${TMPDIR}/Firmware_extractor/out"
-        sudo rm firmware.zip  # Clean up firmware zip after extraction
+        ./extractor.sh firmware.zip
         echo -e "${GREEN}- Downloaded and extracted firmware"
+
+        # Move extracted firmware images to the images folder
+        mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${TMPDIR}/Firmware_extractor/out"/* || exit
+        echo -e "${BLUE}- Moved extracted firmware images"
+        cd "${GITHUB_WORKSPACE}"
+        sudo rm -rf "${TMPDIR}/Firmware_extractor"  # Clean up firmware extractor directory
     fi
 }
 
@@ -141,13 +147,6 @@ final_steps() {
     echo -e "${BLUE}- Created ${DEVICE} working directory"
 
     echo -e "${YELLOW}- Zipping fastboot files"
-
-    # Move firmware files back to images directory before zipping
-    if [ -d "${TMPDIR}/Firmware_extractor/out" ]; then
-        mv "${TMPDIR}/Firmware_extractor/out"/* "${GITHUB_WORKSPACE}/${DEVICE}/images/"
-        sudo rm -rf "${TMPDIR}/Firmware_extractor"  # Clean up firmware extractor directory
-    fi
-
     zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}" || true
     echo -e "${GREEN}- ${DEVICE}_fastboot.zip created successfully"
 
