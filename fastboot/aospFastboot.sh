@@ -6,6 +6,7 @@ URL="$1"
 GITHUB_WORKSPACE="$2"
 DEVICE="$3"
 KEY="$4"
+FIRMWARE_URL="$5"  # New input for firmware URL
 
 MAGISK_PATCH="${GITHUB_WORKSPACE}/magisk/boot_patch.sh"
 UPLOAD="${GITHUB_WORKSPACE}/tools/upload.sh"
@@ -16,6 +17,18 @@ GREEN='\033[1;32m'
 
 trap 'rm -rf "${TMPDIR}"' EXIT
 TMPDIR=$(mktemp -d)
+
+download_and_extract_firmware() {
+    if [ -n "${FIRMWARE_URL}" ]; then
+        echo -e "${BLUE}- Starting downloading firmware"
+        mkdir -p "${TMPDIR}/Firmware_extractor"
+        cd "${TMPDIR}/Firmware_extractor"
+        wget "${FIRMWARE_URL}" -O firmware.zip
+        unzip -o firmware.zip -d "${TMPDIR}/Firmware_extractor/out"
+        sudo rm firmware.zip  # Clean up firmware zip after extraction
+        echo -e "${GREEN}- Downloaded and extracted firmware"
+    fi
+}
 
 download_recovery_rom() {
     echo -e "${BLUE}- Starting downloading recovery rom"
@@ -95,6 +108,7 @@ create_super_image() {
 move_super_image() {
     echo -e "${YELLOW}- Moving super image"
     mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${GITHUB_WORKSPACE}/super_maker/super.img" || exit
+    sudo rm -rf "${GITHUB_WORKSPACE}/super_maker"  # Clean up super_maker directory
     echo -e "${BLUE}- Moved super image"
 }
 
@@ -127,11 +141,21 @@ final_steps() {
     echo -e "${BLUE}- Created ${DEVICE} working directory"
 
     echo -e "${YELLOW}- Zipping fastboot files"
+
+    # Move firmware files back to images directory before zipping
+    if [ -d "${TMPDIR}/Firmware_extractor/out" ]; then
+        mv "${TMPDIR}/Firmware_extractor/out"/* "${GITHUB_WORKSPACE}/${DEVICE}/images/"
+        sudo rm -rf "${TMPDIR}/Firmware_extractor"  # Clean up firmware extractor directory
+    fi
+
     zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}" || true
     echo -e "${GREEN}- ${DEVICE}_fastboot.zip created successfully"
+
+    sudo rm -rf "${GITHUB_WORKSPACE:?}/${DEVICE}"  # Clean up device directory
 }
 
 # Main Execution
+download_and_extract_firmware  # New step to handle firmware extraction first
 download_recovery_rom
 set_permissions_and_create_dirs
 extract_payload_bin
