@@ -26,8 +26,15 @@ download_and_extract_firmware() {
         IMAGES=("apusys.img" "audio_dsp.img" "ccu.img" "dpm.img" "gpueb.img" "gz.img" "lk.img" "mcf_ota.img" "mcupm.img" "md1img.img" "mvpu_algo.img" "pi_img.img" "scp.img" "spmfw.img")
         mkdir -p firmware_images
 
+        # Extract all files to a temporary directory
+        unzip -q firmware.zip -d firmware_temp
+        if [ $? -ne 0 ]; then
+            exit 1
+        fi
+
+        # Find and move the specified image files
         for img in "${IMAGES[@]}"; do
-            unzip -j -o firmware.zip "**/${img}" -d firmware_images
+            find firmware_temp -type f -name "${img}" -exec mv {} firmware_images/ \;
             if [ $? -ne 0 ]; then
                 exit 1
             fi
@@ -39,7 +46,8 @@ download_and_extract_firmware() {
             exit 1
         fi
 
-        rm -rf firmware.zip firmware_images
+        # Clean up
+        rm -rf firmware.zip firmware_images firmware_temp
     fi
 }
 
