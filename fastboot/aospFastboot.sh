@@ -22,22 +22,27 @@ download_and_extract_firmware() {
         if [ $? -ne 0 ]; then
             exit 1
         fi
+
         IMAGES=("apusys.img" "audio_dsp.img" "ccu.img" "dpm.img" "gpueb.img" "gz.img" "lk.img" "mcf_ota.img" "mcupm.img" "md1img.img" "mvpu_algo.img" "pi_img.img" "scp.img" "spmfw.img")
         mkdir -p firmware_images
+
         for img in "${IMAGES[@]}"; do
-            unzip -o firmware.zip "${img}" -d firmware_images
+            unzip -j -o firmware.zip "**/${img}" -d firmware_images
             if [ $? -ne 0 ]; then
                 exit 1
             fi
         done
+
         mkdir -p "${GITHUB_WORKSPACE}/new_firmware"
         mv firmware_images/* "${GITHUB_WORKSPACE}/new_firmware/"
         if [ $? -ne 0 ]; then
             exit 1
         fi
+
         rm -rf firmware.zip firmware_images
     fi
 }
+
 
 download_recovery_rom() {
     echo -e "${BLUE}- Starting downloading recovery rom"
