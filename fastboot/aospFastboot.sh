@@ -6,7 +6,7 @@ URL="$1"
 GITHUB_WORKSPACE="$2"
 DEVICE="$3"
 KEY="$4"
-FIRMWARE_URL="$5"  # New input for firmware URL
+FIRMWARE_URL="$5"
 
 MAGISK_PATCH="${GITHUB_WORKSPACE}/magisk/boot_patch.sh"
 UPLOAD="${GITHUB_WORKSPACE}/tools/upload.sh"
@@ -15,43 +15,27 @@ YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
 GREEN='\033[1;32m'
 
-check_disk_space() {
-    local required_space_mb=5000  # Adjust this value as needed
-    local available_space_mb=$(df --output=avail -m "$GITHUB_WORKSPACE" | tail -1)
-
-    if (( available_space_mb < required_space_mb )); then
-        echo -e "${RED}- Error: Not enough disk space. Required: ${required_space_mb}MB, Available: ${available_space_mb}MB"
-        exit 1
-    fi
-}
-
 download_and_extract_firmware() {
     if [ -n "${FIRMWARE_URL}" ]; then
-        echo -e "${BLUE}- Starting downloading firmware"
         cd "${GITHUB_WORKSPACE}"
-        git clone --recurse-submodules https://github.com/AndroidDumps/Firmware_extractor.git
-        cd Firmware_extractor
         aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -o "firmware.zip" "${FIRMWARE_URL}"
         if [ $? -ne 0 ]; then
-            echo -e "${RED}- Error: Failed to download firmware"
             exit 1
         fi
-        ./extractor.sh firmware.zip
-        echo -e "${GREEN}- Downloaded and extracted firmware"
-
-        # Move extracted firmware images to the new firmware folder
+        IMAGES=("apusys.img" "audio_dsp.img" "ccu.img" "dpm.img" "gpueb.img" "gz.img" "lk.img" "mcf_ota.img" "mcupm.img" "md1img.img" "mvpu_algo.img" "pi_img.img" "scp.img" "spmfw.img")
+        mkdir -p firmware_images
+        for img in "${IMAGES[@]}"; do
+            unzip -o firmware.zip "${img}" -d firmware_images
+            if [ $? -ne 0 ]; then
+                exit 1
+            fi
+        done
         mkdir -p "${GITHUB_WORKSPACE}/new_firmware"
-        if [ -d "out" ]; then
-            mv out/* "${GITHUB_WORKSPACE}/new_firmware/" || exit
-        elif [ -d "extracted" ]; then
-            mv extracted/* "${GITHUB_WORKSPACE}/new_firmware/" || exit
-        else
-            echo -e "${RED}- Error: No extracted files found"
+        mv firmware_images/* "${GITHUB_WORKSPACE}/new_firmware/"
+        if [ $? -ne 0 ]; then
             exit 1
         fi
-        echo -e "${BLUE}- Moved extracted firmware images"
-        cd "${GITHUB_WORKSPACE}"
-        sudo rm -rf Firmware_extractor  # Clean up firmware extractor directory
+        rm -rf firmware.zip firmware_images
     fi
 }
 
@@ -133,7 +117,7 @@ create_super_image() {
 move_super_image() {
     echo -e "${YELLOW}- Moving super image"
     mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${GITHUB_WORKSPACE}/super_maker/super.img" || exit
-    sudo rm -rf "${GITHUB_WORKSPACE}/super_maker"  # Clean up super_maker directory
+    sudo rm -rf "${GITHUB_WORKSPACE}/super_maker"
     echo -e "${BLUE}- Moved super image"
 }
 
@@ -162,10 +146,9 @@ final_steps() {
     mv "${GITHUB_WORKSPACE}/${DEVICE}/images/vendor_boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/vendor_boot/"
     mv "${GITHUB_WORKSPACE}/tools/flasher.exe" "${GITHUB_WORKSPACE}/${DEVICE}/"
 
-    # Move the new firmware images to the device's images folder before zipping
     if [ -d "${GITHUB_WORKSPACE}/new_firmware" ]; then
         mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${GITHUB_WORKSPACE}/new_firmware"/* || exit
-        sudo rm -rf "${GITHUB_WORKSPACE}/new_firmware"  # Clean up new firmware directory
+        sudo rm -rf "${GITHUB_WORKSPACE}/new_firmware"
     fi
 
     cd "${GITHUB_WORKSPACE}" || exit
@@ -175,11 +158,10 @@ final_steps() {
     zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}" || true
     echo -e "${GREEN}- ${DEVICE}_fastboot.zip created successfully"
 
-    sudo rm -rf "${GITHUB_WORKSPACE:?}/${DEVICE}"  # Clean up device directory
+    sudo rm -rf "${GITHUB_WORKSPACE:?}/${DEVICE}"
 }
 
 # Main Execution
-check_disk_space
 download_and_extract_firmware
 download_recovery_rom
 set_permissions_and_create_dirs
