@@ -173,7 +173,6 @@ final_steps() {
 }
 
 # Main Execution
-download_and_extract_firmware
 download_recovery_rom
 set_permissions_and_create_dirs
 extract_payload_bin
