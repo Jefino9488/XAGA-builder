@@ -170,8 +170,6 @@ final_steps() {
     echo -e "${YELLOW}- Zipping fastboot files"
     zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}" || true
     echo -e "${GREEN}- ${DEVICE}_fastboot.zip created successfully"
-
-    sudo rm -rf "${GITHUB_WORKSPACE:?}/${DEVICE}"
 }
 
 # Main Execution
