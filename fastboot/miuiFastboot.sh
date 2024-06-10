@@ -92,28 +92,35 @@ echo -e "${BLUE}- moved super image"
 
 # Create device working directory
 echo -e "${YELLOW}- ${device} fastboot working directory"
-mkdir -p "${github_workspace}/${device}/boot"
-mkdir -p "${github_workspace}/${device}/vendor_boot"
+mkdir -p "${github_workspace}/boot"
 mkdir -p "${github_workspace}/zip"
 
 # Patch boot image
 echo -e "${YELLOW}- patching boot image"
-cp "${github_workspace}/${device}/images/boot.img" "${github_workspace}/${device}/boot/"
+cp "${github_workspace}/${device}/images/boot.img" "${github_workspace}/boot/"
 chmod +x "${MAGISK_PATCH}"
-${MAGISK_PATCH} "${github_workspace}/${device}/boot/boot.img"
+${MAGISK_PATCH} "${github_workspace}/boot/boot.img"
 if [ $? -ne 0 ]; then
     echo -e "${RED}- failed to patch boot image"
     exit 1
 fi
 echo -e "${BLUE}- patched boot image"
 
-mv "${github_workspace}/magisk/new-boot.img" "${github_workspace}/${device}/boot/magisk_boot.img"
+mv "${github_workspace}/magisk/new-boot.img" "${github_workspace}/${device}/images/magisk_boot.img"
 
-mv "${github_workspace}/${device}/images/boot.img" "${github_workspace}/${device}/boot/"
+# Download the latest Fastboot Flasher release
+echo -e "${YELLOW}- Downloading the latest Fastboot Flasher release"
+LATEST_RELEASE_URL=$(curl -s "https://api.github.com/repos/Jefino9488/Fastboot-Flasher/releases/latest" | jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url')
+if [ -z "$LATEST_RELEASE_URL" ]; then
+    echo -e "${RED}- Could not find a valid download URL for the latest release."
+    exit 1
+fi
 
-mv "${github_workspace}/${device}/images/vendor_boot.img" "${github_workspace}/${device}/vendor_boot/"
-
-cp "${github_workspace}/tools/flasher.exe" "${github_workspace}/${device}/"
+ZIP_FILE="${github_workspace}/${device}/fastboot_flasher.zip"
+curl -L "$LATEST_RELEASE_URL" -o "$ZIP_FILE"
+unzip -o "$ZIP_FILE" -d "${github_workspace}/${device}"
+rm "$ZIP_FILE"
+echo -e "${GREEN}- Downloaded and extracted the latest Fastboot Flasher release"
 
 if [ -f "${github_workspace}/tools/preloader_ari.bin" ]; then
     cp "${github_workspace}/tools/preloader_ari.bin" "${github_workspace}/${device}/images/"
@@ -125,6 +132,6 @@ fi
 cd "${github_workspace}" || exit
 
 # Zip fastboot files
-echo -e "${YELLOW}- ziping fastboot files"
+echo -e "${YELLOW}- zipping fastboot files"
 zip -r "${github_workspace}/zip/${device}_fastboot.zip" "${device}" || true
 echo -e "${color_green}- ${device}_fastboot.zip created successfully"
