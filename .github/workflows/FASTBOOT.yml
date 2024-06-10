@@ -97,8 +97,9 @@ jobs:
       - name: Upload Release
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
-          cp "$GITHUB_WORKSPACE/${device}/boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
-          cp "$GITHUB_WORKSPACE/${device}/vendor_boot/"*.img "$GITHUB_WORKSPACE/GithubRelease/"
+          cp "$GITHUB_WORKSPACE/${device}/images/"boot.img "$GITHUB_WORKSPACE/GithubRelease/"
+          cp "$GITHUB_WORKSPACE/${device}/images/"vendor_boot.img "$GITHUB_WORKSPACE/GithubRelease/"
+          cp "$GITHUB_WORKSPACE/${device}/images/"magisk_boot.img "$GITHUB_WORKSPACE/GithubRelease/"
           cd "$GITHUB_WORKSPACE/GithubRelease"
           chmod +w "$GITHUB_WORKSPACE/GithubRelease"
           threshold_size=$((1950 * 1024 * 1024))
