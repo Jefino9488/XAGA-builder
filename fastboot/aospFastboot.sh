@@ -168,11 +168,9 @@ final_steps() {
         sudo rm -rf "${GITHUB_WORKSPACE}/new_firmware"
     fi
 
-    # Ensure the images directory exists inside the zip folder
     mkdir -p "${GITHUB_WORKSPACE}/zip/images"
 
-    # Move the images into the images folder inside the zip directory
-    mv "${GITHUB_WORKSPACE}/${DEVICE}/images"/* "${GITHUB_WORKSPACE}/zip/images/"
+    cp "${GITHUB_WORKSPACE}/${DEVICE}/images"/* "${GITHUB_WORKSPACE}/zip/images/"
 
     cd "${GITHUB_WORKSPACE}/zip" || exit
 
