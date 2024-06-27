@@ -123,7 +123,7 @@ rm "$ZIP_FILE"
 echo -e "${GREEN}- Downloaded and extracted the latest Fastboot Flasher release"
 
 if [ -f "${github_workspace}/tools/preloader_ari.bin" ]; then
-    cp "${github_workspace}/tools/preloader_ari.bin" "${github_workspace}/${device}/images/"
+    cp "${github_workspace}/tools/preloader_ari.bin" "${github_workspace}/${device}/images/preloader_xaga.bin"
     echo -e "${color_green}preloader_ari.bin copied successfully"
 else
     echo -e "${color_red}Failed to copy preloader_ari.bin"

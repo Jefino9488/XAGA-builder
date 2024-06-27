@@ -51,7 +51,6 @@ download_and_extract_firmware() {
     fi
 }
 
-
 download_recovery_rom() {
     echo -e "${BLUE}- Starting downloading recovery rom"
     aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -d "${GITHUB_WORKSPACE}" -o "recovery_rom.zip" "${URL}"
@@ -69,7 +68,7 @@ extract_payload_bin() {
     echo -e "${YELLOW}- Extracting payload.bin"
     RECOVERY_ZIP="recovery_rom.zip"
     7z x "${GITHUB_WORKSPACE}/${RECOVERY_ZIP}" -o"${GITHUB_WORKSPACE}/${DEVICE}" payload.bin || true
-    rm -rf "${GITHUB_WORKSPACE:?}/${RECOVERY_ZIP}"
+    rm -rf "${GITHUB_WORKSPACE:?}/${RECOVERY_ZIP:?}"
     echo -e "${BLUE}- Extracted payload.bin"
 }
 
@@ -77,7 +76,7 @@ extract_images() {
     echo -e "${YELLOW}- Extracting images"
     mkdir -p "${GITHUB_WORKSPACE}/${DEVICE}/images"
     "${GITHUB_WORKSPACE}/tools/payload-dumper-go" -o "${GITHUB_WORKSPACE}/${DEVICE}/images" "${GITHUB_WORKSPACE}/${DEVICE}/payload.bin" >/dev/null
-    sudo rm -rf "${GITHUB_WORKSPACE}/${DEVICE}/payload.bin"
+    sudo rm -rf "${GITHUB_WORKSPACE:?}/${DEVICE:?}/payload.bin"
     echo -e "${BLUE}- Extracted images"
 }
 
@@ -135,17 +134,25 @@ move_super_image() {
 }
 
 prepare_device_directory() {
-    echo -e "${YELLOW}- Preparing ${DEVICE} fastboot working directory"
-    mkdir -p "${GITHUB_WORKSPACE}/${DEVICE}/boot"
-    mkdir -p "${GITHUB_WORKSPACE}/${DEVICE}/vendor_boot"
-    mkdir -p "${GITHUB_WORKSPACE}/zip"
+    echo -e "${YELLOW}- Downloading and preparing ${DEVICE} fastboot working directory"
+
+    # Download the latest release from the GitHub repository
+    LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/Jefino9488/Fastboot-Flasher/releases/latest | grep "browser_download_url.*zip" | cut -d '"' -f 4)
+    aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -o "${DEVICE}_fastboot_latest.zip" "${LATEST_RELEASE_URL}"
+
+    # Extract the downloaded zip
+    unzip -q "${DEVICE}_fastboot_latest.zip" -d "${GITHUB_WORKSPACE}/zip"
+
+    # Remove the downloaded zip file
+    rm "${DEVICE}_fastboot_latest.zip"
+
+    echo -e "${BLUE}- Downloaded and prepared ${DEVICE} fastboot working directory"
 }
 
 patch_boot_image() {
     echo -e "${YELLOW}- Patching boot image"
-    cp "${GITHUB_WORKSPACE}/${DEVICE}/images/boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/boot/"
     chmod +x "${MAGISK_PATCH}"
-    ${MAGISK_PATCH} "${GITHUB_WORKSPACE}/${DEVICE}/boot/boot.img"
+    ${MAGISK_PATCH} "${GITHUB_WORKSPACE}/${DEVICE}/images/boot.img"
     if [ $? -ne 0 ]; then
         echo -e "${RED}- Failed to patch boot image"
         exit 1
@@ -154,21 +161,20 @@ patch_boot_image() {
 }
 
 final_steps() {
-    mv "${GITHUB_WORKSPACE}/magisk/new-boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/boot/magisk_boot.img"
-    mv "${GITHUB_WORKSPACE}/${DEVICE}/images/boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/boot/"
-    mv "${GITHUB_WORKSPACE}/${DEVICE}/images/vendor_boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/vendor_boot/"
-    mv "${GITHUB_WORKSPACE}/tools/flasher.exe" "${GITHUB_WORKSPACE}/${DEVICE}/"
+    mv "${GITHUB_WORKSPACE}/magisk/new-boot.img" "${GITHUB_WORKSPACE}/${DEVICE}/images/magisk_boot.img"
 
     if [ -d "${GITHUB_WORKSPACE}/new_firmware" ]; then
         mv -t "${GITHUB_WORKSPACE}/${DEVICE}/images" "${GITHUB_WORKSPACE}/new_firmware"/* || exit
         sudo rm -rf "${GITHUB_WORKSPACE}/new_firmware"
     fi
 
-    cd "${GITHUB_WORKSPACE}" || exit
-    echo -e "${BLUE}- Created ${DEVICE} working directory"
+    # Move images to the extracted `images` folder within the zip directory
+    mv "${GITHUB_WORKSPACE}/${DEVICE}/images"/* "${GITHUB_WORKSPACE}/zip/images/"
+
+    cd "${GITHUB_WORKSPACE}/zip" || exit
 
     echo -e "${YELLOW}- Zipping fastboot files"
-    zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" "${DEVICE}" || true
+    zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" . || true
     echo -e "${GREEN}- ${DEVICE}_fastboot.zip created successfully"
 }
 
