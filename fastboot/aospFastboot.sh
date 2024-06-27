@@ -136,14 +136,11 @@ move_super_image() {
 prepare_device_directory() {
     echo -e "${YELLOW}- Downloading and preparing ${DEVICE} fastboot working directory"
 
-    # Download the latest release from the GitHub repository
     LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/Jefino9488/Fastboot-Flasher/releases/latest | grep "browser_download_url.*zip" | cut -d '"' -f 4)
     aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -o "${DEVICE}_fastboot_latest.zip" "${LATEST_RELEASE_URL}"
 
-    # Extract the downloaded zip
     unzip -q "${DEVICE}_fastboot_latest.zip" -d "${GITHUB_WORKSPACE}/zip"
 
-    # Remove the downloaded zip file
     rm "${DEVICE}_fastboot_latest.zip"
 
     echo -e "${BLUE}- Downloaded and prepared ${DEVICE} fastboot working directory"
@@ -177,6 +174,9 @@ final_steps() {
     echo -e "${YELLOW}- Zipping fastboot files"
     zip -r "${GITHUB_WORKSPACE}/zip/${DEVICE}_fastboot.zip" . || true
     echo -e "${GREEN}- ${DEVICE}_fastboot.zip created successfully"
+    rm -rf "${GITHUB_WORKSPACE}/zip/images"
+
+    echo -e "${GREEN}- All done!"
 }
 
 # Main Execution
