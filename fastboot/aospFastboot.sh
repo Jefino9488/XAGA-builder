@@ -137,11 +137,11 @@ prepare_device_directory() {
     echo -e "${YELLOW}- Downloading and preparing ${DEVICE} fastboot working directory"
 
     LATEST_RELEASE_URL=$(curl -s https://api.github.com/repos/Jefino9488/Fastboot-Flasher/releases/latest | grep "browser_download_url.*zip" | cut -d '"' -f 4)
-    aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -o "${DEVICE}_fastboot_latest.zip" "${LATEST_RELEASE_URL}"
+    aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -o "fastboot_flasher_latest.zip" "${LATEST_RELEASE_URL}"
 
-    unzip -q "${DEVICE}_fastboot_latest.zip" -d "${GITHUB_WORKSPACE}/zip"
+    unzip -q "fastboot_flasher_latest.zip" -d "${GITHUB_WORKSPACE}/zip"
 
-    rm "${DEVICE}_fastboot_latest.zip"
+    rm "fastboot_flasher_latest.zip"
 
     echo -e "${BLUE}- Downloaded and prepared ${DEVICE} fastboot working directory"
 }
