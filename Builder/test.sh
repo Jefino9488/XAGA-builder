@@ -7,6 +7,11 @@ WORKSPACE="$3"
 
 # Set Permissions and create directories
 sudo chmod -R +rwx "${GITHUB_WORKSPACE}/tools"
+
+# Grant execution permissions to the tools
+sudo chmod +x "${WORKSPACE}/tools/payload-dumper-go"
+sudo chmod +x "${WORKSPACE}/tools/payload_extract"
+
 # Download package
 echo -e "${BLUE}- Downloading package"
 aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -d "${WORKSPACE}" -o "recovery_rom.zip" "${URL}"
@@ -25,7 +30,7 @@ mkdir -p "${WORKSPACE}/${DEVICE}/images"
 sudo rm -rf "${WORKSPACE}/${DEVICE}/payload.bin"
 echo -e "${BLUE}- extracted images"
 
-# decompress images
+# Decompress images
 echo -e "${YELLOW}- decompressing images"
 mkdir -p "${WORKSPACE}/${DEVICE}/images/decompressed"
 for img in product system system_ext vendor odm; do
@@ -33,8 +38,7 @@ for img in product system system_ext vendor odm; do
     echo -e "${BLUE}- decompressed $img"
 done
 
-# list all content 
-
+# List all content
 echo -e "${YELLOW}- listing all content"
 ls -alh "${WORKSPACE}/${DEVICE}/images/decompressed"
 ls -alh "${WORKSPACE}/${DEVICE}/images"
