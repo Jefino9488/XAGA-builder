@@ -52,19 +52,19 @@ for partition in "${partitions[@]}"; do
   echo -e "${Red}- Generating: $partition"
 
   # Apply file system patch
-  sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/"$partition" "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config
+  sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/images/"$partition" "$WORKSPACE"/images/config/"$partition"_fs_config
 
   # Apply file contexts patch
-  sudo python3 "$GITHUB_WORKSPACE"/tools/contextpatch.py "$GITHUB_WORKSPACE"/images/"$partition" "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts
+  sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/images/"$partition" "$WORKSPACE"/images/config/"$partition"_file_contexts
 
   # Repack the partition
-  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts "$GITHUB_WORKSPACE"/images/"$partition".img "$GITHUB_WORKSPACE"/images/"$partition".img
+  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/images/config/"$partition"_file_contexts "$WORKSPACE"/images/"$partition".img "$WORKSPACE"/images/"$partition".img
 
   # Calculate and store the size of the new image
-  eval "${partition}_size=$(du -sb "$GITHUB_WORKSPACE"/images/$partition.img | awk '{print $1}')"
+  eval "${partition}_size=$(du -sb "$WORKSPACE"/images/$partition.img | awk '{print $1}')"
 
   # Clean up decompressed image directory
-  sudo rm -rf "$GITHUB_WORKSPACE"/images/"$partition"
+  sudo rm -rf "$WORKSPACE"/images/"$partition"
 
   echo -e "${Green}- Repacked: $partition"
 done
