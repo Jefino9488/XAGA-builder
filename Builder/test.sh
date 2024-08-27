@@ -32,14 +32,11 @@ mkdir -p "${WORKSPACE}/${DEVICE}/images"
 sudo rm -rf "${WORKSPACE}/${DEVICE}/payload.bin"
 echo -e "${BLUE}- extracted images"
 
-# Create decompressed images directory
-mkdir -p "${WORKSPACE}/${DEVICE}/images/decompressed"
-
 # Decompress images to eimages/decompressed directory
 echo -e "${YELLOW}- decompressing images"
 for i in product system system_ext; do
   echo -e "${YELLOW}- Decomposing ported package: $i"
-  sudo "${WORKSPACE}/tools/extract.erofs" -s -i "${WORKSPACE}/${DEVICE}/images/$i.img" -x -o "${WORKSPACE}/${DEVICE}/images/decompressed"
+  sudo "${WORKSPACE}/tools/extract.erofs" -s -i "${WORKSPACE}/${DEVICE}/images/$i.img" -x -o "${WORKSPACE}/${DEVICE}/images/"
   rm -rf "${WORKSPACE}/${DEVICE}/images/$i.img"
   echo -e "${BLUE}- decompressed $i"
 done
@@ -55,28 +52,30 @@ for partition in "${partitions[@]}"; do
   echo -e "${Red}- Generating: $partition"
 
   # Apply file system patch
-  sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/images/decompressed/"$partition".img "$WORKSPACE"/images/config/"$partition"_fs_config
+  sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/"$partition".img "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config
 
   # Apply file contexts patch
-  sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/images/decompressed/"$partition".img "$WORKSPACE"/images/config/"$partition"_file_contexts
+  sudo python3 "$GITHUB_WORKSPACE"/tools/contextpatch.py "$GITHUB_WORKSPACE"/images/"$partition".img "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts
 
   # Repack the partition
-  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/images/config/"$partition"_file_contexts "$WORKSPACE"/images/decompressed/"$partition".img "$WORKSPACE"/images/"$partition".img
+  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts "$GITHUB_WORKSPACE"/images/"$partition".img "$GITHUB_WORKSPACE"/images/"$partition".img
 
   # Calculate and store the size of the new image
-  eval "${partition}_size=$(du -sb "$WORKSPACE"/images/"$partition".img | awk '{print $1}')"
+  eval "${partition}_size=$(du -sb "$GITHUB_WORKSPACE"/images/$partition.img | awk '{print $1}')"
 
   # Clean up decompressed image directory
-  sudo rm -rf "$WORKSPACE"/images/decompressed/"$partition"
+  sudo rm -rf "$GITHUB_WORKSPACE"/images/"$partition"
 
   echo -e "${Green}- Repacked: $partition"
 done
 
 echo -e "${Green}- All partitions repacked"
 
+
+echo -e "${Green}- All partitions repacked"
+
 # List all content
 echo -e "${YELLOW}- listing all content"
-ls -alh "${WORKSPACE}/${DEVICE}/images/decompressed"
 ls -alh "${WORKSPACE}/${DEVICE}/images"
 
 # Clean up
