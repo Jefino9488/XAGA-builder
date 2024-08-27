@@ -150,6 +150,10 @@ final_steps() {
 
     echo -e "${GREEN}- All done!"
 }
+echo -e "${YELLOW}- listing all content"
+ls -alh "${WORKSPACE}/${DEVICE}/images"
+ls -alh "${WORKSPACE}/${DEVICE}/images/config"
+
 move_images_and_calculate_sizes
 create_super_image
 move_super_image
@@ -157,8 +161,4 @@ prepare_device_directory
 patch_boot_image
 final_steps
 
-# List all content
-echo -e "${YELLOW}- listing all content"
-ls -alh "${WORKSPACE}/${DEVICE}/images"
-ls -alh "${WORKSPACE}/${DEVICE}/images/config"
 
