@@ -10,7 +10,7 @@ sudo chmod -R +rwx "${GITHUB_WORKSPACE}/tools"
 
 # Grant execution permissions to the tools
 sudo chmod +x "${WORKSPACE}/tools/payload-dumper-go"
-sudo chmod +x "${WORKSPACE}/tools/erofs_extract"
+sudo chmod +x "${WORKSPACE}/tools/extract.erofs"
 
 # Download package
 echo -e "${BLUE}- Downloading package"
@@ -37,7 +37,7 @@ mkdir -p "${WORKSPACE}/${DEVICE}/images/decompressed"
 echo -e "${YELLOW}- decompressing images"
 for i in product system system_ext; do
   echo -e "${YELLOW}- Decomposing ported package: $i"
-  sudo "${WORKSPACE}/tools/erofs_extract" -s -i "${WORKSPACE}/${DEVICE}/images/$i.img" -x -o "${WORKSPACE}/${DEVICE}/images/decompressed"
+  sudo "${WORKSPACE}/tools/extract.erofs" -s -i "${WORKSPACE}/${DEVICE}/images/$i.img" -x -o "${WORKSPACE}/${DEVICE}/images/decompressed"
   rm -rf "${WORKSPACE}/${DEVICE}/images/$i.img"
   echo -e "${BLUE}- decompressed $i"
 done
