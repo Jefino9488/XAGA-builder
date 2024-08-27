@@ -48,25 +48,14 @@ echo -e "${YELLOW}- repacking images"
 partitions=("product" "system" "system_ext" "vendor" "odm")
 
 # Repack each partition
+partitions=("product" "system" "system_ext")
 for partition in "${partitions[@]}"; do
-  echo -e "${Red}- Generating: $partition"
-
-  # Apply file system patch
-  sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/images/"$partition" "$WORKSPACE"/images/config/"$partition"_fs_config
-
-  # Apply file contexts patch
-  sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/images/"$partition" "$WORKSPACE"/images/config/"$partition"_file_contexts
-
-  # Repack the partition
-  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/images/config/"$partition"_file_contexts "$WORKSPACE"/images/"$partition".img "$WORKSPACE"/images/"$partition".img
-
-  # Calculate and store the size of the new image
-  eval "${partition}_size=$(du -sb "$WORKSPACE"/images/$partition.img | awk '{print $1}')"
-
-  # Clean up decompressed image directory
-  sudo rm -rf "$WORKSPACE"/images/"$partition"
-
-  echo -e "${Green}- Repacked: $partition"
+  echo -e "${Red}- generating: $partition"
+  sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/"${DEVICE}"/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config
+  sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/${DEVICE}/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts
+  sudo $erofs_mkfs --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts "$WORKSPACE"/"${DEVICE}"/images/$partition.img "$WORKSPACE"/"${DEVICE}"/images/$partition
+  eval "${partition}_size=$(du -sb "$WORKSPACE"/"${DEVICE}"/images/$partition.img | awk '{print $1}')"
+  sudo rm -rf "$WORKSPACE"/"${DEVICE}"/images/$partition
 done
 
 echo -e "${Green}- All partitions repacked"
