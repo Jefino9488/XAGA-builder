@@ -37,7 +37,7 @@ mkdir -p "${WORKSPACE}/${DEVICE}/images/decompressed"
 echo -e "${YELLOW}- decompressing images"
 for i in product system system_ext; do
   echo -e "${YELLOW}- Decomposing ported package: $i"
-  sudo "${WORKSPACE}/tools/erofs_extract" -s -i "${WORKSPACE}/${DEVICE}/images/$i.img" -x -o "${WORKSPACE}/${DEVICE}/images/decompressed/$i.img"
+  sudo "${WORKSPACE}/tools/erofs_extract" -s -i "${WORKSPACE}/${DEVICE}/images/$i.img" -x -o "${WORKSPACE}/${DEVICE}/images/decompressed"
   rm -rf "${WORKSPACE}/${DEVICE}/images/$i.img"
   echo -e "${BLUE}- decompressed $i"
 done
