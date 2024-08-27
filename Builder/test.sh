@@ -5,6 +5,12 @@ URL="$1"
 DEVICE="$2"
 WORKSPACE="$3"
 
+RED='\033[1;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+GREEN='\033[1;32m'
+
+MAGISK_PATCH="${WORKSPACE}/magisk/boot_patch.sh"
 # Set Permissions and create directories
 sudo chmod -R +rwx "${WORKSPACE}/tools"
 
@@ -153,8 +159,9 @@ final_steps() {
 echo -e "${YELLOW}- listing all content"
 ls -alh "${WORKSPACE}/${DEVICE}/images"
 ls -alh "${WORKSPACE}/${DEVICE}/images/config"
-mkdir -p "${WORKSPACE}/super_maker/config"
+mkdir -p "${WORKSPACE}/super_maker"
 mkdir -p "${WORKSPACE}/zip"
+
 move_images_and_calculate_sizes
 create_super_image
 move_super_image
