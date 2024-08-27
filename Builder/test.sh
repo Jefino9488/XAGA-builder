@@ -11,7 +11,9 @@ sudo chmod -R +rwx "${GITHUB_WORKSPACE}/tools"
 # Grant execution permissions to the tools
 sudo chmod +x "${WORKSPACE}/tools/payload-dumper-go"
 sudo chmod +x "${WORKSPACE}/tools/extract.erofs"
-
+sudo chmod +x "${WORKSPACE}/tools/fspatch.py"
+sudo chmod +x "${WORKSPACE}/tools/contextpatch.py"
+sudo chmod +x "${WORKSPACE}/tools/mkfs.erofs"
 # Download package
 echo -e "${BLUE}- Downloading package"
 aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -d "${WORKSPACE}" -o "recovery_rom.zip" "${URL}"
@@ -41,6 +43,36 @@ for i in product system system_ext; do
   rm -rf "${WORKSPACE}/${DEVICE}/images/$i.img"
   echo -e "${BLUE}- decompressed $i"
 done
+
+
+# repack images
+echo -e "${YELLOW}- repacking images"
+# List of partitions to process
+partitions=("product" "system" "system_ext" "vendor" "odm")
+
+# Repack each partition
+for partition in "${partitions[@]}"; do
+  echo -e "${Red}- Generating: $partition"
+
+  # Apply file system patch
+  sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/images/decompressed/"$partition".img "$WORKSPACE"/images/config/"$partition"_fs_config
+
+  # Apply file contexts patch
+  sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/images/decompressed/"$partition".img "$WORKSPACE"/images/config/"$partition"_file_contexts
+
+  # Repack the partition
+  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/images/config/"$partition"_file_contexts "$WORKSPACE"/images/decompressed/"$partition".img "$WORKSPACE"/images/"$partition".img
+
+  # Calculate and store the size of the new image
+  eval "${partition}_size=$(du -sb "$WORKSPACE"/images/"$partition".img | awk '{print $1}')"
+
+  # Clean up decompressed image directory
+  sudo rm -rf "$WORKSPACE"/images/decompressed/"$partition"
+
+  echo -e "${Green}- Repacked: $partition"
+done
+
+echo -e "${Green}- All partitions repacked"
 
 # List all content
 echo -e "${YELLOW}- listing all content"
