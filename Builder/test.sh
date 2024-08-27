@@ -5,6 +5,8 @@ URL="$1"
 DEVICE="$2"
 WORKSPACE="$3"
 
+# Set Permissions and create directories
+sudo chmod -R +rwx "${GITHUB_WORKSPACE}/tools"
 # Download package
 echo -e "${BLUE}- Downloading package"
 aria2c -x16 -j"$(nproc)" -U "Mozilla/5.0" -d "${WORKSPACE}" -o "recovery_rom.zip" "${URL}"
@@ -27,7 +29,7 @@ echo -e "${BLUE}- extracted images"
 echo -e "${YELLOW}- decompressing images"
 mkdir -p "${WORKSPACE}/${DEVICE}/images/decompressed"
 for img in product system system_ext vendor odm; do
-    "${WORKSPACE}/tools/sdat2img" "${WORKSPACE}/${DEVICE}/images/$img.img" "${WORKSPACE}/${DEVICE}/images/decompressed/$img.img" || exit
+    "${WORKSPACE}/tools/payload_extract" "${WORKSPACE}/${DEVICE}/images/$img.img" "${WORKSPACE}/${DEVICE}/images/decompressed/$img.img" || exit
     echo -e "${BLUE}- decompressed $img"
 done
 
