@@ -153,7 +153,8 @@ final_steps() {
 echo -e "${YELLOW}- listing all content"
 ls -alh "${WORKSPACE}/${DEVICE}/images"
 ls -alh "${WORKSPACE}/${DEVICE}/images/config"
-
+mkdir -p "${WORKSPACE}/super_maker/config"
+mkdir -p "${WORKSPACE}/zip"
 move_images_and_calculate_sizes
 create_super_image
 move_super_image
