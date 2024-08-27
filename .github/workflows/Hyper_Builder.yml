@@ -47,3 +47,13 @@ jobs:
       - name: Build ROM
         run: |
           sudo bash "$GITHUB_WORKSPACE"/Builder/test.sh ${{ github.event.inputs.URL }} ${{ env.device }} $GITHUB_WORKSPACE
+          
+
+      - name: Upload ROM
+        id: Fastboot-Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.device }}_fastboot
+          path: ${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip
+          compression-level: 0
+          retention-days: 1
