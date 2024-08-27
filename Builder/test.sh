@@ -41,27 +41,20 @@ for i in product system system_ext; do
   echo -e "${BLUE}- decompressed $i"
 done
 
-
 # repack images
 echo -e "${YELLOW}- repacking images"
-# List of partitions to process
-partitions=("product" "system" "system_ext" "vendor" "odm")
-
-# Repack each partition
 partitions=("product" "system" "system_ext")
 for partition in "${partitions[@]}"; do
   echo -e "${Red}- generating: $partition"
   sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/"${DEVICE}"/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config
   sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/${DEVICE}/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts
-  sudo $erofs_mkfs --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts "$WORKSPACE"/"${DEVICE}"/images/$partition.img "$WORKSPACE"/"${DEVICE}"/images/$partition
+  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts "$WORKSPACE"/"${DEVICE}"/images/$partition.img "$WORKSPACE"/"${DEVICE}"/images/$partition
   eval "${partition}_size=$(du -sb "$WORKSPACE"/"${DEVICE}"/images/$partition.img | awk '{print $1}')"
   sudo rm -rf "$WORKSPACE"/"${DEVICE}"/images/$partition
 done
 
 echo -e "${Green}- All partitions repacked"
 
-
-echo -e "${Green}- All partitions repacked"
 
 # List all content
 echo -e "${YELLOW}- listing all content"
