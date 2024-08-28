@@ -60,6 +60,10 @@ jobs:
         run: |
           sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/system_ext.sh ${{ env.device }} $GITHUB_WORKSPACE
 
+      - name: Modify Vendor
+        run: |
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/vendor.sh ${{ env.device }} $GITHUB_WORKSPACE
+
       - name: Patch Boot
         run: |
           sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/patchBOOT.sh ${{ env.device }} $GITHUB_WORKSPACE

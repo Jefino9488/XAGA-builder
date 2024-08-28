@@ -6,7 +6,7 @@ sudo chmod +x "${WORKSPACE}/tools/contextpatch.py"
 sudo chmod +x "${WORKSPACE}/tools/mkfs.erofs"
 
 echo -e "${YELLOW}- repacking images"
-partitions=("product" "system" "system_ext")
+partitions=("product" "system" "system_ext" "vendor")
 for partition in "${partitions[@]}"; do
   echo -e "${Red}- generating: $partition"
   sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/"${DEVICE}"/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config
