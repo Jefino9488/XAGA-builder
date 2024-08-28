@@ -46,31 +46,31 @@ jobs:
 
       - name: Download & Unpack
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/unpack.sh ${{ github.event.inputs.URL }} ${{ env.device }} $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/test.sh ${{ github.event.inputs.URL }} ${{ env.device }} $GITHUB_WORKSPACE
 
-      - name: Modify Product
-        run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/product.sh ${{ env.device }} $GITHUB_WORKSPACE
-
-#      - name: Modify System
+#      - name: Modify Product
 #        run: |
-#          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/system.sh ${{ env.device }} $GITHUB_WORKSPACE
-
-      - name: Modify System_ext
-        run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/system_ext.sh ${{ env.device }} $GITHUB_WORKSPACE
-
-      - name: Modify Vendor
-        run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/vendor.sh ${{ env.device }} $GITHUB_WORKSPACE
-
-      - name: Patch Boot
-        run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/patchBOOT.sh ${{ env.device }} $GITHUB_WORKSPACE
-
-      - name: Repack
-        run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/repack.sh ${{ env.device }} $GITHUB_WORKSPACE
+#          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/product.sh ${{ env.device }} $GITHUB_WORKSPACE
+#
+##      - name: Modify System
+##        run: |
+##          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/system.sh ${{ env.device }} $GITHUB_WORKSPACE
+#
+#      - name: Modify System_ext
+#        run: |
+#          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/system_ext.sh ${{ env.device }} $GITHUB_WORKSPACE
+#
+#      - name: Modify Vendor
+#        run: |
+#          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/vendor.sh ${{ env.device }} $GITHUB_WORKSPACE
+#
+#      - name: Patch Boot
+#        run: |
+#          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/patchBOOT.sh ${{ env.device }} $GITHUB_WORKSPACE
+#
+#      - name: Repack
+#        run: |
+#          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/repack.sh ${{ env.device }} $GITHUB_WORKSPACE
 
       - name: Upload ROM
         id: Fastboot-Upload
