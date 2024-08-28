@@ -44,10 +44,21 @@ jobs:
           echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d"/" -f4)" >> $GITHUB_ENV
           sudo apt-get install python3 aria2 p7zip-full zstd dos2unix
 
-      - name: Build ROM
+      - name: Download & Unpack
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/test.sh ${{ github.event.inputs.URL }} ${{ env.device }} $GITHUB_WORKSPACE
-          
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/unpack.sh ${{ github.event.inputs.URL }} ${{ env.device }} $GITHUB_WORKSPACE
+
+      - name: Modify Product
+        run: |
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/product.sh ${{ env.device }} $GITHUB_WORKSPACE
+
+      - name: Patch Boot
+        run: |
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/patchBOOT.sh ${{ env.device }} $GITHUB_WORKSPACE
+
+      - name: Repack
+        run: |
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/repack.sh ${{ env.device }} $GITHUB_WORKSPACE
 
       - name: Upload ROM
         id: Fastboot-Upload
