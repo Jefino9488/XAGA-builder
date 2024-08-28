@@ -46,7 +46,7 @@ jobs:
 
       - name: Download & Unpack
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/test.sh ${{ github.event.inputs.URL }} ${{ env.device }} $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/Builder/test.sh ${{ github.event.inputs.URL }} ${{ env.device }} $GITHUB_WORKSPACE
 
 #      - name: Modify Product
 #        run: |
