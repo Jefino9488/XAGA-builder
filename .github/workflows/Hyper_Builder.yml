@@ -52,9 +52,13 @@ jobs:
         run: |
           sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/product.sh ${{ env.device }} $GITHUB_WORKSPACE
 
-      - name: Modify System
+#      - name: Modify System
+#        run: |
+#          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/system.sh ${{ env.device }} $GITHUB_WORKSPACE
+
+      - name: Modify System_ext
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/system.sh ${{ env.device }} $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/system_ext.sh ${{ env.device }} $GITHUB_WORKSPACE
 
       - name: Patch Boot
         run: |
