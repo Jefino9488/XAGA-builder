@@ -19,7 +19,7 @@ echo -e "${Green}- All partitions repacked"
 move_images_and_calculate_sizes() {
     echo -e "${YELLOW}- Moving images to super_maker and calculating sizes"
     local IMAGE
-    for IMAGE in vendor product system system_ext odm_dlkm odm vendor_dlkm; do
+    for IMAGE in vendor product system system_ext odm_dlkm odm vendor_dlkm mi_ext; do
         mv -t "${WORKSPACE}/super_maker" "${WORKSPACE}/${DEVICE}/images/$IMAGE.img" || exit
         eval "${IMAGE}_size=\$(du -b \"${WORKSPACE}/super_maker/$IMAGE.img\" | awk '{print \$1}')"
         echo -e "${BLUE}- Moved $IMAGE"
@@ -28,7 +28,7 @@ move_images_and_calculate_sizes() {
     # Calculate total size of all images
     echo -e "${YELLOW}- Calculating total size of all images"
     super_size=9126805504
-    total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_size + odm_dlkm_size + vendor_dlkm_size))
+    total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_size + odm_dlkm_size + vendor_dlkm_size + mi_ext_size))
     echo -e "${BLUE}- Size of all images"
     echo -e "system: $system_size"
     echo -e "system_ext: $system_ext_size"
@@ -37,6 +37,7 @@ move_images_and_calculate_sizes() {
     echo -e "odm: $odm_size"
     echo -e "odm_dlkm: $odm_dlkm_size"
     echo -e "vendor_dlkm: $vendor_dlkm_size"
+    echo -e "mi_ext: $mi_ext_size"
     echo -e "total size: $total_size"
 }
 
@@ -56,6 +57,8 @@ create_super_image() {
         --partition odm_dlkm_b:readonly:0:main_b \
         --partition odm_a:readonly:"${odm_size}":main_a --image odm_a=./super_maker/odm.img \
         --partition odm_b:readonly:0:main_b \
+        --partition mi_ext_a:readonly:"${mi_ext_size}":main_a --image mi_ext_a=./super_maker/mi_ext.img \
+        --partition mi_ext_b:readonly:0:main_b \
         --partition vendor_dlkm_a:readonly:"${vendor_dlkm_size}":main_a --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
         --partition vendor_dlkm_b:readonly:0:main_b \
         --virtual-ab --sparse --output "${WORKSPACE}/super_maker/super.img" || exit

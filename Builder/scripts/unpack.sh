@@ -1,15 +1,21 @@
-sudo apt-get remove -y firefox zstd
-sudo apt-get install python3 aria2
+#!/bin/bash
 
+# Remove unwanted packages
+sudo apt-get remove -y firefox zstd
+
+# Install required packages
+sudo apt-get install -y python3 aria2
+
+# Parameters
 URL="$1"
 DEVICE="$2"
 WORKSPACE="$3"
 
+# Colors for output
 RED='\033[1;31m'
 YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
 GREEN='\033[1;32m'
-
 
 # Set Permissions and create directories
 sudo chmod -R +rwx "${WORKSPACE}/tools"
@@ -36,9 +42,10 @@ mkdir -p "${WORKSPACE}/${DEVICE}/images"
 sudo rm -rf "${WORKSPACE}/${DEVICE}/payload.bin"
 echo -e "${BLUE}- extracted images"
 
+# Decompress images
 echo -e "${YELLOW}- decompressing images"
-for i in product system system_ext; do
-  echo -e "${YELLOW}- Decomposing image: $i"
+for i in product system system_ext vendor; do
+  echo -e "${YELLOW}- Decompressing image: $i"
   sudo "${WORKSPACE}/tools/extract.erofs" -s -i "${WORKSPACE}/${DEVICE}/images/$i.img" -x -o "${WORKSPACE}/${DEVICE}/images/"
   rm -rf "${WORKSPACE}/${DEVICE}/images/$i.img"
   echo -e "${BLUE}- decompressed $i"
