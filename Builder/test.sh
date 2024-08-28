@@ -49,16 +49,8 @@ done
 # modify
 echo -e "${YELLOW}- modifying product"
 ls -alh "${WORKSPACE}/${DEVICE}/images/product/data-app/"
-unwanted_files=("MIUIDriveMode" "MIUIDuokanReader" "MIUIQuickSearchBox" "MIUIVideo" "MIUIGameCenter")
+ls -alh "${WORKSPACE}/${DEVICE}/images/product/data-app/system"
 
-for file in "${unwanted_files[@]}"; do
-  appsuite=$(find "${WORKSPACE}/${DEVICE}/images/product/data-app/" -type d -name "*$file")
-  if [ -d "$appsuite" ]; then
-    echo -e "${YELLOW}- removing: $file"
-    sudo rm -rf "$appsuite"
-  fi
-done
-echo -e "${BLUE}- modified product"
 # repack images
 echo -e "${YELLOW}- repacking images"
 partitions=("product" "system" "system_ext")
