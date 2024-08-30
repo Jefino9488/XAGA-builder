@@ -1,9 +1,9 @@
 DEVICE="$1"
 WORKSPACE="$2"
 
-## Install apkeep
-#sudo apt-get install -y cargo
-#cargo install apkeep
+sudo apt-get install -y cargo
+export PATH=$PATH:$HOME/.cargo/bin
+cargo install apkeep
 
 RED='\033[1;31m'
 YELLOW='\033[1;33m'
@@ -27,10 +27,12 @@ for dir in "${dirs[@]}"; do
   done
 done
 
+OUTPATH="${WORKSPACE}/apps"
+mkdir -p "${OUTPATH}"
 echo -e "${YELLOW}- Downloading the latest Gboard APK"
-#apkeep -a "com.google.android.inputmethod.latin" -o "${WORKSPACE}/apps/goboard.apk"
-#mkdir -p "${WORKSPACE}/${DEVICE}/images/product/app/Gboard"
-#mv "${WORKSPACE}/apps/goboard.apk" "${WORKSPACE}/${DEVICE}/images/product/app/Gboard"
+apkeep -a "com.google.android.inputmethod.latin" "${OUTPATH}/gboard.apk"
+mkdir -p "${WORKSPACE}/${DEVICE}/images/product/app/Gboard"
+mv "${OUTPATH}/goboard.apk" "${WORKSPACE}/${DEVICE}/images/product/app/Gboard"
 
 ls -alh "${WORKSPACE}/${DEVICE}/images/product/data-app/"
 ls -alh "${WORKSPACE}/${DEVICE}/images/product/app/"
