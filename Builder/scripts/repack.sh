@@ -99,8 +99,6 @@ final_steps() {
     sudo "${WORKSPACE}/tools/vbmeta-disable-verification" "${WORKSPACE}/${DEVICE}/images/vbmeta.img"
     sudo "${WORKSPACE}/tools/vbmeta-disable-verification" "${WORKSPACE}/${DEVICE}/images/vbmeta_vendor.img"
 
-    echo -e "${YELLOW}- Zipping fastboot files"
-
     mkdir -p "${WORKSPACE}/zip/images"
 
     cp "${WORKSPACE}/${DEVICE}/images"/* "${WORKSPACE}/zip/images/"
