@@ -4,64 +4,76 @@ WORKSPACE="$2"
 sudo chmod +x "${WORKSPACE}/tools/fspatch.py"
 sudo chmod +x "${WORKSPACE}/tools/contextpatch.py"
 sudo chmod +x "${WORKSPACE}/tools/mkfs.erofs"
+sudo chmod +x "${WORKSPACE}/tools/make_ext4fs"
+
+pack_type=EXT
 
 echo -e "${YELLOW}- repacking images"
+case $partition in
+    mi_ext) extraSize=4194304 ;;       # 4 MB
+    odm) extraSize=34217728 ;;         # 32.6 MB
+    system|vendor|system_ext) extraSize=84217728 ;;  # 80.3 MB
+    product) extraSize=104217728 ;;     # 99.5 MB
+    *) extraSize=8554432 ;;            # Default size for others, 8.15 MB
+esac
+
 partitions=("product" "system" "system_ext" "vendor")
 for partition in "${partitions[@]}"; do
-  echo -e "${Red}- generating: $partition"
-  sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/"${DEVICE}"/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config
-  sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/${DEVICE}/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts
-  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts "$WORKSPACE"/"${DEVICE}"/images/$partition.img "$WORKSPACE"/"${DEVICE}"/images/$partition
-  sudo rm -rf "$WORKSPACE"/"${DEVICE}"/images/$partition
+  echo -e "${Red}- Generating: $partition"
+  partition_size=$(du -sb "$WORKSPACE/${DEVICE}/images/$partition" | tr -cd 0-9)
+  total_size=$((partition_size + extraSize))
+  sudo python3 "$WORKSPACE/tools/fspatch.py" "$WORKSPACE/${DEVICE}/images/$partition" "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config"
+  sudo python3 "$WORKSPACE/tools/contextpatch.py" "$WORKSPACE/${DEVICE}/images/$partition" "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts"
+  sudo "${WORKSPACE}/tools/make_ext4fs" -J -T "$(date +%s)" -S "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts" -C "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config" -L "$partition" -a "$partition" -l "$total_size" "$WORKSPACE/${DEVICE}/images/${partition}.img" "$WORKSPACE/${DEVICE}/images/$partition"
+  sudo rm -rf "$WORKSPACE/${DEVICE}/images/$partition"
 done
+
+
 echo -e "${Green}- All partitions repacked"
 
 move_images_and_calculate_sizes() {
     echo -e "${YELLOW}- Moving images to super_maker and calculating sizes"
     local IMAGE
     for IMAGE in vendor product system system_ext odm_dlkm odm vendor_dlkm mi_ext; do
-        mv -t "${WORKSPACE}/super_maker" "${WORKSPACE}/${DEVICE}/images/$IMAGE.img" || exit
-        eval "${IMAGE}_size=\$(du -b \"${WORKSPACE}/super_maker/$IMAGE.img\" | awk '{print \$1}')"
-        echo -e "${BLUE}- Moved $IMAGE"
+        if [ -f "${WORKSPACE}/${DEVICE}/images/$IMAGE.img" ]; then
+            mv -t "${WORKSPACE}/super_maker" "${WORKSPACE}/${DEVICE}/images/$IMAGE.img" || exit
+            eval "${IMAGE}_size=\$(du -b \"${WORKSPACE}/super_maker/$IMAGE.img\" | awk '{print \$1}')"
+            echo -e "${BLUE}- Moved $IMAGE"
+        fi
     done
 
     # Calculate total size of all images
     echo -e "${YELLOW}- Calculating total size of all images"
     super_size=9126805504
-    total_size=$((system_size + system_ext_size + product_size + vendor_size + odm_size + odm_dlkm_size + vendor_dlkm_size + mi_ext_size))
+    total_size=$((${system_size:-0} + ${system_ext_size:-0} + ${product_size:-0} + ${vendor_size:-0} + ${odm_size:-0} + ${odm_dlkm_size:-0} + ${vendor_dlkm_size:-0} + ${mi_ext_size:-0}))
     echo -e "${BLUE}- Size of all images"
-    echo -e "system: $system_size"
-    echo -e "system_ext: $system_ext_size"
-    echo -e "product: $product_size"
-    echo -e "vendor: $vendor_size"
-    echo -e "odm: $odm_size"
-    echo -e "odm_dlkm: $odm_dlkm_size"
-    echo -e "vendor_dlkm: $vendor_dlkm_size"
-    echo -e "mi_ext: $mi_ext_size"
+    echo -e "system: ${system_size:-0}"
+    echo -e "system_ext: ${system_ext_size:-0}"
+    echo -e "product: ${product_size:-0}"
+    echo -e "vendor: ${vendor_size:-0}"
+    echo -e "odm: ${odm_size:-0}"
+    echo -e "odm_dlkm: ${odm_dlkm_size:-0}"
+    echo -e "vendor_dlkm: ${vendor_dlkm_size:-0}"
+    echo -e "mi_ext: ${mi_ext_size:-0}"
     echo -e "total size: $total_size"
 }
 
 create_super_image() {
     echo -e "${YELLOW}- Creating super image"
-    "${WORKSPACE}/tools/lpmake" --metadata-size 65536 --super-name super --block-size 4096 --metadata-slots 3 \
-        --device super:"${super_size}" --group main_a:"${total_size}" --group main_b:"${total_size}" \
-        --partition system_a:readonly:"${system_size}":main_a --image system_a=./super_maker/system.img \
-        --partition system_b:readonly:0:main_b \
-        --partition system_ext_a:readonly:"${system_ext_size}":main_a --image system_ext_a=./super_maker/system_ext.img \
-        --partition system_ext_b:readonly:0:main_b \
-        --partition product_a:readonly:"${product_size}":main_a --image product_a=./super_maker/product.img \
-        --partition product_b:readonly:0:main_b \
-        --partition vendor_a:readonly:"${vendor_size}":main_a --image vendor_a=./super_maker/vendor.img \
-        --partition vendor_b:readonly:0:main_b \
-        --partition odm_dlkm_a:readonly:"${odm_dlkm_size}":main_a --image odm_dlkm_a=./super_maker/odm_dlkm.img \
-        --partition odm_dlkm_b:readonly:0:main_b \
-        --partition odm_a:readonly:"${odm_size}":main_a --image odm_a=./super_maker/odm.img \
-        --partition odm_b:readonly:0:main_b \
-        --partition mi_ext_a:readonly:"${mi_ext_size}":main_a --image mi_ext_a=./super_maker/mi_ext.img \
-        --partition mi_ext_b:readonly:0:main_b \
-        --partition vendor_dlkm_a:readonly:"${vendor_dlkm_size}":main_a --image vendor_dlkm_a=./super_maker/vendor_dlkm.img \
-        --partition vendor_dlkm_b:readonly:0:main_b \
-        --virtual-ab --sparse --output "${WORKSPACE}/super_maker/super.img" || exit
+
+    lpargs="--metadata-size 65536 --super-name super --block-size 4096 --metadata-slots 3 --device super:${super_size} --group main_a:${super_size} --group main_b:${super_size}"
+
+    for pname in system system_ext product vendor odm_dlkm odm vendor_dlkm mi_ext; do
+        if [ -f "${WORKSPACE}/super_maker/${pname}.img" ]; then
+            subsize=$(du -sb "${WORKSPACE}/super_maker/${pname}.img" | tr -cd 0-9)
+            echo -e "${GREEN}Super sub-partition [$pname] size: [$subsize]"
+            lpargs="$lpargs --partition ${pname}_a:readonly:${subsize}:main_a --image ${pname}_a=${WORKSPACE}/super_maker/${pname}.img --partition ${pname}_b:readonly:0:main_b"
+        fi
+    done
+
+    # Execute the lpmake command with the constructed lpargs
+    "${WORKSPACE}/tools/lpmake" $lpargs --virtual-ab --sparse --output "${WORKSPACE}/super_maker/super.img" || exit
+
     echo -e "${BLUE}- Created super image"
 }
 

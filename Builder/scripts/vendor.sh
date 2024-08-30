@@ -15,3 +15,10 @@ for dir in "${dirs[@]}"; do
     fi
   done
 done
+
+find "${WORKSPACE}/${DEVICE}/images/vendor/etc/" -type f -name "fstab.*" | while read -r fstab; do
+    sed -i '/system *erofs/d' "$fstab"
+    sed -i '/system_ext *erofs/d' "$fstab"
+    sed -i '/vendor *erofs/d' "$fstab"
+    sed -i '/product *erofs/d' "$fstab"
+done
