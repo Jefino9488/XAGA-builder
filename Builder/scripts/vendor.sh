@@ -1,6 +1,11 @@
 DEVICE="$1"
 WORKSPACE="$2"
 
+RED='\033[1;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+GREEN='\033[1;32m'
+
 ls -alh "${WORKSPACE}/${DEVICE}/images/vendor/etc/"
 
 unwanted_files=("voicecommand")
@@ -14,11 +19,4 @@ for dir in "${dirs[@]}"; do
       sudo rm -rf "$appsuite"
     fi
   done
-done
-
-find "${WORKSPACE}/${DEVICE}/images/vendor/etc/" -type f -name "fstab.*" | while read -r fstab; do
-    sed -i '/system *erofs/d' "$fstab"
-    sed -i '/system_ext *erofs/d' "$fstab"
-    sed -i '/vendor *erofs/d' "$fstab"
-    sed -i '/product *erofs/d' "$fstab"
 done

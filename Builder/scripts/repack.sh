@@ -1,6 +1,11 @@
 DEVICE="$1"
 WORKSPACE="$2"
 
+RED='\033[1;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+GREEN='\033[1;32m'
+
 sudo chmod +x "${WORKSPACE}/tools/fspatch.py"
 sudo chmod +x "${WORKSPACE}/tools/contextpatch.py"
 sudo chmod +x "${WORKSPACE}/tools/mkfs.erofs"
@@ -11,11 +16,9 @@ for partition in "${partitions[@]}"; do
   echo -e "${Red}- generating: $partition"
   sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/"${DEVICE}"/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config
   sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/${DEVICE}/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts
-  sudo "${WORKSPACE}/tools/mkfs.erofs" -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts "$WORKSPACE"/"${DEVICE}"/images/$partition.img "$WORKSPACE"/"${DEVICE}"/images/$partition
+  sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts "$WORKSPACE"/"${DEVICE}"/images/$partition.img "$WORKSPACE"/"${DEVICE}"/images/$partition
   sudo rm -rf "$WORKSPACE"/"${DEVICE}"/images/$partition
 done
-echo -e "${Green}- All partitions repacked"
-
 echo -e "${Green}- All partitions repacked"
 
 
