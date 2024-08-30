@@ -4,46 +4,17 @@ WORKSPACE="$2"
 sudo chmod +x "${WORKSPACE}/tools/fspatch.py"
 sudo chmod +x "${WORKSPACE}/tools/contextpatch.py"
 sudo chmod +x "${WORKSPACE}/tools/mkfs.erofs"
-sudo chmod +x "${WORKSPACE}/tools/make_ext4fs"
 
-pack_type=EXT
-
-echo -e "${YELLOW}- Repacking images"
-
-# Define partition sizes based on their type
-case $partition in
-    mi_ext) extraSize=4194304 ;;       # 4 MB
-    odm) extraSize=34217728 ;;         # 32.6 MB
-    system|vendor|system_ext|product) extraSize=157286400 ;;  # 150 MB
-    *) extraSize=8554432 ;;            # Default size for others, 8.15 MB
-esac
-
-partitions=("product" "system" "system_ext" "vendor")
+echo -e "${YELLOW}- repacking images"
+partitions=("product" "system" "system_ext")
 for partition in "${partitions[@]}"; do
-  echo -e "${Red}- Generating: $partition"
-
-  # Calculate partition size in bytes
-  partition_size=$(du -sb "$WORKSPACE/${DEVICE}/images/$partition" | tr -cd 0-9)
-
-  # Calculate total size with extra space
-  total_size=$((partition_size + extraSize))
-
-  # Apply patches
-  sudo python3 "$WORKSPACE/tools/fspatch.py" "$WORKSPACE/${DEVICE}/images/$partition" "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config"
-  sudo python3 "$WORKSPACE/tools/contextpatch.py" "$WORKSPACE/${DEVICE}/images/$partition" "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts"
-
-  # Create filesystem image
-  sudo "${WORKSPACE}/tools/make_ext4fs" -J -T "$(date +%s)" -S "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts" -C "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config" -L "$partition" -a "$partition" -l "$total_size" "$WORKSPACE/${DEVICE}/images/${partition}.img" "$WORKSPACE/${DEVICE}/images/$partition"
-
-  # Check if image creation was successful
-  if [ $? -ne 0 ]; then
-    echo -e "${RED}Error: Failed to create ${partition}.img. Please check if the allocated size is sufficient.${NC}"
-    exit 1
-  fi
-
-  # Remove original partition directory
-  sudo rm -rf "$WORKSPACE/${DEVICE}/images/$partition"
+  echo -e "${Red}- generating: $partition"
+  sudo python3 "$WORKSPACE"/tools/fspatch.py "$WORKSPACE"/"${DEVICE}"/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config
+  sudo python3 "$WORKSPACE"/tools/contextpatch.py "$WORKSPACE"/${DEVICE}/images/$partition "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts
+  sudo "${WORKSPACE}/tools/mkfs.erofs" -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts "$WORKSPACE"/"${DEVICE}"/images/$partition.img "$WORKSPACE"/"${DEVICE}"/images/$partition
+  sudo rm -rf "$WORKSPACE"/"${DEVICE}"/images/$partition
 done
+echo -e "${Green}- All partitions repacked"
 
 echo -e "${Green}- All partitions repacked"
 
