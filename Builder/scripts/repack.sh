@@ -9,25 +9,15 @@ sudo chmod +x "${WORKSPACE}/tools/make_ext4fs"
 pack_type=EXT
 
 echo -e "${YELLOW}- repacking images"
-case $partition in
-    mi_ext) extraSize=4194304 ;;       # 4 MB
-    odm) extraSize=34217728 ;;         # 32.6 MB
-    system|vendor|system_ext) extraSize=84217728 ;;  # 80.3 MB
-    product) extraSize=104217728 ;;     # 99.5 MB
-    *) extraSize=8554432 ;;            # Default size for others, 8.15 MB
-esac
-
 partitions=("product" "system" "system_ext" "vendor")
 for partition in "${partitions[@]}"; do
-  echo -e "${Red}- Generating: $partition"
+  echo -e "${Red}- generating: $partition"
   partition_size=$(du -sb "$WORKSPACE/${DEVICE}/images/$partition" | tr -cd 0-9)
-  total_size=$((partition_size + extraSize))
   sudo python3 "$WORKSPACE/tools/fspatch.py" "$WORKSPACE/${DEVICE}/images/$partition" "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config"
   sudo python3 "$WORKSPACE/tools/contextpatch.py" "$WORKSPACE/${DEVICE}/images/$partition" "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts"
-  sudo "${WORKSPACE}/tools/make_ext4fs" -J -T "$(date +%s)" -S "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts" -C "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config" -L "$partition" -a "$partition" -l "$total_size" "$WORKSPACE/${DEVICE}/images/${partition}.img" "$WORKSPACE/${DEVICE}/images/$partition"
+  sudo "${WORKSPACE}/tools/make_ext4fs" -J -T "$(date +%s)" -S "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts" -C "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config" -L "$partition" -a "$partition" -l "$partition_size" "$WORKSPACE/${DEVICE}/images/${partition}.img" "$WORKSPACE/${DEVICE}/images/$partition"
   sudo rm -rf "$WORKSPACE/${DEVICE}/images/$partition"
 done
-
 
 echo -e "${Green}- All partitions repacked"
 
