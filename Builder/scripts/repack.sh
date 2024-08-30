@@ -9,6 +9,7 @@ GREEN='\033[1;32m'
 sudo chmod +x "${WORKSPACE}/tools/fspatch.py"
 sudo chmod +x "${WORKSPACE}/tools/contextpatch.py"
 sudo chmod +x "${WORKSPACE}/tools/mkfs.erofs"
+sudo chmod +x "${WORKSPACE}/tools/vbmeta-disable-verification"
 
 echo -e "${YELLOW}- repacking images"
 partitions=("vendor" "product" "system" "system_ext")
@@ -19,6 +20,7 @@ for partition in "${partitions[@]}"; do
   sudo "${WORKSPACE}/tools/mkfs.erofs" --quiet -zlz4hc,9 -T 1230768000 --mount-point /"$partition" --fs-config-file "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_fs_config --file-contexts "$WORKSPACE"/"${DEVICE}"/images/config/"$partition"_file_contexts "$WORKSPACE"/"${DEVICE}"/images/$partition.img "$WORKSPACE"/"${DEVICE}"/images/$partition
   sudo rm -rf "$WORKSPACE"/"${DEVICE}"/images/$partition
 done
+sudo rm -rf "${WORKSPACE}/${DEVICE}/images/config"
 echo -e "${Green}- All partitions repacked"
 
 
@@ -91,10 +93,11 @@ prepare_device_directory() {
 final_steps() {
     mv "${WORKSPACE}/magisk/new-boot.img" "${WORKSPACE}/${DEVICE}/images/magisk_boot.img"
 
-    if [ -d "${WORKSPACE}/new_firmware" ]; then
-        mv -t "${WORKSPACE}/${DEVICE}/images" "${WORKSPACE}/new_firmware"/* || exit
-        sudo rm -rf "${WORKSPACE}/new_firmware"
-    fi
+    echo -e "${YELLOW}- patching vbmeta"
+
+    sudo "${WORKSPACE}/tools/vbmeta-disable-verification" "${WORKSPACE}/${DEVICE}/images/vbmeta_system.img"
+    sudo "${WORKSPACE}/tools/vbmeta-disable-verification" "${WORKSPACE}/${DEVICE}/images/vbmeta.img"
+    sudo "${WORKSPACE}/tools/vbmeta-disable-verification" "${WORKSPACE}/${DEVICE}/images/vbmeta_vendor.img"
 
     mkdir -p "${WORKSPACE}/zip/images"
 
