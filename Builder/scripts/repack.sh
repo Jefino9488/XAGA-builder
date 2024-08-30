@@ -14,8 +14,7 @@ echo -e "${YELLOW}- Repacking images"
 case $partition in
     mi_ext) extraSize=4194304 ;;       # 4 MB
     odm) extraSize=34217728 ;;         # 32.6 MB
-    system|vendor|system_ext) extraSize=84217728 ;;  # 80.3 MB
-    product) extraSize=104217728 ;;     # 99.5 MB
+    system|vendor|system_ext|product) extraSize=157286400 ;;  # 150 MB
     *) extraSize=8554432 ;;            # Default size for others, 8.15 MB
 esac
 
