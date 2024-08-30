@@ -8,18 +8,46 @@ sudo chmod +x "${WORKSPACE}/tools/make_ext4fs"
 
 pack_type=EXT
 
-echo -e "${YELLOW}- repacking images"
+echo -e "${YELLOW}- Repacking images"
+
+# Define partition sizes based on their type
+case $partition in
+    mi_ext) extraSize=4194304 ;;       # 4 MB
+    odm) extraSize=34217728 ;;         # 32.6 MB
+    system|vendor|system_ext) extraSize=84217728 ;;  # 80.3 MB
+    product) extraSize=104217728 ;;     # 99.5 MB
+    *) extraSize=8554432 ;;            # Default size for others, 8.15 MB
+esac
+
 partitions=("product" "system" "system_ext" "vendor")
 for partition in "${partitions[@]}"; do
-  echo -e "${Red}- generating: $partition"
+  echo -e "${Red}- Generating: $partition"
+
+  # Calculate partition size in bytes
   partition_size=$(du -sb "$WORKSPACE/${DEVICE}/images/$partition" | tr -cd 0-9)
+
+  # Calculate total size with extra space
+  total_size=$((partition_size + extraSize))
+
+  # Apply patches
   sudo python3 "$WORKSPACE/tools/fspatch.py" "$WORKSPACE/${DEVICE}/images/$partition" "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config"
   sudo python3 "$WORKSPACE/tools/contextpatch.py" "$WORKSPACE/${DEVICE}/images/$partition" "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts"
-  sudo "${WORKSPACE}/tools/make_ext4fs" -J -T "$(date +%s)" -S "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts" -C "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config" -L "$partition" -a "$partition" -l "$partition_size" "$WORKSPACE/${DEVICE}/images/${partition}.img" "$WORKSPACE/${DEVICE}/images/$partition"
+
+  # Create filesystem image
+  sudo "${WORKSPACE}/tools/make_ext4fs" -J -T "$(date +%s)" -S "$WORKSPACE/${DEVICE}/images/config/${partition}_file_contexts" -C "$WORKSPACE/${DEVICE}/images/config/${partition}_fs_config" -L "$partition" -a "$partition" -l "$total_size" "$WORKSPACE/${DEVICE}/images/${partition}.img" "$WORKSPACE/${DEVICE}/images/$partition"
+
+  # Check if image creation was successful
+  if [ $? -ne 0 ]; then
+    echo -e "${RED}Error: Failed to create ${partition}.img. Please check if the allocated size is sufficient.${NC}"
+    exit 1
+  fi
+
+  # Remove original partition directory
   sudo rm -rf "$WORKSPACE/${DEVICE}/images/$partition"
 done
 
 echo -e "${Green}- All partitions repacked"
+
 
 move_images_and_calculate_sizes() {
     echo -e "${YELLOW}- Moving images to super_maker and calculating sizes"
