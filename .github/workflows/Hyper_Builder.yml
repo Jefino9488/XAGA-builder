@@ -4,8 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       URL:
-        description: official recovery rom
+        description: 'Official recovery ROM'
         required: true
+        type: string
+      region:
+        description: 'Select region'
+        required: true
+        type: choice
+        options:
+          - 'CN'
+          - 'Global'
+
 
 jobs:
   build:
@@ -50,7 +59,7 @@ jobs:
 
       - name: Modify Product
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/product.sh ${{ env.device }} $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/product.sh ${{ env.device }} $GITHUB_WORKSPACE ${{ github.event.inputs.region }}
 
 #      - name: Modify System
 #        run: |
