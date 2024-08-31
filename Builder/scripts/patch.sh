@@ -104,11 +104,12 @@ echo -e "${BLUE}- decompiled miui_framework dex files"
 
 # patch framework files
 echo -e "${YELLOW}- patching framework files"
+cd "${WORKSPACE}/Builder/framework_patcher/" || exit
 if [ "$FRAMEWORK" == "core_patch" ]; then
-  python3 "${WORKSPACE}/Builder/framework_patcher/framework_patch.py"
-  python3 "${WORKSPACE}/Builder/framework_patcher/services_patch.py"
-  python3 "${WORKSPACE}/Builder/framework_patcher/miui-service_Patch.py"
-  python3 "${WORKSPACE}/Builder/framework_patcher/miui-framework_patch.py"
+  python3 framework_patch.py
+  python3 services_patch.py
+  python3 miui-service_Patch.py
+  python3 miui-framework_patch.py
 else
   python3 "${WORKSPACE}/Builder/framework_patcher/nframework_patch.py"
   python3 "${WORKSPACE}/Builder/framework_patcher/nservices_patch.py"
@@ -119,27 +120,27 @@ fi
 # compile framework files
 echo -e "${YELLOW}- compiling framework dex files"
 if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes.dex
 else
   echo -e "${RED}- classes not found in framework"
 fi
 if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes2 ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes2 a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes2.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes2 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes2.dex
 else
   echo -e "${RED}- classes2 not found in framework"
 fi
 if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes3 ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes3 a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes3.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes3 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes3.dex
 else
   echo -e "${RED}- classes3 not found in framework"
 fi
 if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes4 ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes4 a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes4.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes4 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes4.dex
 else
   echo -e "${RED}- classes4 not found in framework"
 fi
 if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes5 ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes5 a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes5.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/framework/classes5 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes5.dex
 else
   echo -e "${RED}- classes5 not found in framework"
 fi
@@ -148,27 +149,27 @@ echo -e "${BLUE}- compiled framework dex files"
 # compile services files
 echo -e "${YELLOW}- compiling services dex files"
 if [ -d ${WORKSPACE}/Builder/framework_patcher/services/services_classes ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes.dex
 else
   echo -e "${RED}- classes not found in services"
 fi
 if [ -d ${WORKSPACE}/Builder/framework_patcher/services/services_classes2 ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes2 a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes2.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes2 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes2.dex
 else
   echo -e "${RED}- classes2 not found in services"
 fi
 if [ -d ${WORKSPACE}/Builder/framework_patcher/services/services_classes3 ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes3 a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes3.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes3 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes3.dex
 else
   echo -e "${RED}- classes3 not found in services"
 fi
 if [ -d ${WORKSPACE}/Builder/framework_patcher/services/services_classes4 ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes4 a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes4.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes4 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes4.dex
 else
   echo -e "${RED}- classes4 not found in services"
 fi
 if [ -d ${WORKSPACE}/Builder/framework_patcher/services/services_classes5 ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes5 a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes5.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services/services_classes5 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes5.dex
 else
   echo -e "${RED}- classes5 not found in services"
 fi
@@ -177,7 +178,7 @@ echo -e "${BLUE}- compiled services dex files"
 # compile miui_services files
 echo -e "${YELLOW}- compiling miui_services dex files"
 if [ -d ${WORKSPACE}/Builder/framework_patcher/miui_services/miui_services_classes ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/miui_services/miui_services_classes a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/miui_services/classes.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/miui_services/miui_services_classes -a 34 -o ${WORKSPACE}/Builder/framework_patcher/miui_services/classes.dex
 else
   echo -e "${RED}- classes not found in miui_services"
 fi
@@ -186,7 +187,7 @@ echo -e "${BLUE}- compiled miui_services dex files"
 # compile miui_framework files
 echo -e "${YELLOW}- compiling miui_framework dex files"
 if [ -d ${WORKSPACE}/Builder/framework_patcher/miui_framework/miui_framework_classes ]; then
-  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/miui_framework/miui_framework_classes a -a 34 -o ${WORKSPACE}/Builder/framework_patcher/miui_framework/classes.dex
+  java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/miui_framework/miui_framework_classes -a 34 -o ${WORKSPACE}/Builder/framework_patcher/miui_framework/classes.dex
 else
   echo -e "${RED}- classes not found in miui_framework"
 fi
