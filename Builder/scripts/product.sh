@@ -46,7 +46,7 @@ if [ "$REGION" == "CN" ]; then
   mkdir -p "${WORKSPACE}/${DEVICE}/images/product/priv-app/Gboard"
   mv "${WORKSPACE}/Builder/apps/goboard.apk" "${WORKSPACE}/${DEVICE}/images/product/priv-app/Gboard/"
   mv "${WORKSPACE}/Builder/permisions/privapp_whitelist_com.google.android.inputmethod.latin.xml" "${WORKSPACE}/${DEVICE}/images/product/etc/permissions/"
-  echo -e "${GREEN}Gboard added for CN region"
+  echo -e "${GREEN}Gboard added"
 fi
 
 ls -alh "${WORKSPACE}/${DEVICE}/images/product/data-app/"

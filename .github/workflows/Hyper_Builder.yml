@@ -14,6 +14,13 @@ on:
         options:
           - 'CN'
           - 'Global'
+      framework:
+        description: 'Select framework patch'
+        required: true
+        type: choice
+        options:
+          - 'patch'
+          - 'core_patch'
 
 
 jobs:
@@ -72,6 +79,10 @@ jobs:
       - name: Modify Vendor
         run: |
           sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/vendor.sh ${{ env.device }} $GITHUB_WORKSPACE
+
+      - name: Patch Framework
+        run: |
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/patch.sh ${{ env.device }} $GITHUB_WORKSPACE ${{ github.event.inputs.framework }}
 
       - name: Patch Boot
         run: |
