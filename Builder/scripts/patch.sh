@@ -4,7 +4,7 @@ FRAMEWORK="$3"
 
 # move framework files
 echo -e "${YELLOW}- moving framework files"
-mkdir "{$WORKSPACE}/framework_patcher/"
+mkdir "${WORKSPACE}/framework_patcher/"
 sudo mv "${WORKSPACE}/${DEVICE}/images/system/system/framework/framework.jar" "${WORKSPACE}/framework_patcher/"
 sudo mv "${WORKSPACE}/${DEVICE}/images/system/system/framework/services.jar" "${WORKSPACE}/framework_patcher/"
 sudo mv "${WORKSPACE}/${DEVICE}/images/system_ext/framework/miui-services.jar" "${WORKSPACE}/framework_patcher/"
@@ -100,15 +100,15 @@ echo -e "${BLUE}- decompiled miui_framework dex files"
 # patch framework files
 echo -e "${YELLOW}- patching framework files"
 if [ "$FRAMEWORK" == "core_patch" ]; then
-  python3 "{$WORKSPACE}/framework_patcher/framework_patch.py"
-  python3 "{$WORKSPACE}/framework_patcher/services_patch.py"
-  python3 "{$WORKSPACE}/framework_patcher/miui-service_Patch.py"
-  python3 "{$WORKSPACE}/framework_patcher/miui-framework_patch.py"
+  python3 "${WORKSPACE}/framework_patcher/framework_patch.py"
+  python3 "${WORKSPACE}/framework_patcher/services_patch.py"
+  python3 "${WORKSPACE}/framework_patcher/miui-service_Patch.py"
+  python3 "${WORKSPACE}/framework_patcher/miui-framework_patch.py"
 else
-  python3 "{$WORKSPACE}/framework_patcher/nframework_patch.py"
-  python3 "{$WORKSPACE}/framework_patcher/nservices_patch.py"
-  python3 "{$WORKSPACE}/framework_patcher/miui-service_Patch.py"
-  python3 "{$WORKSPACE}/framework_patcher/miui-framework_patch.py"
+  python3 "${WORKSPACE}/framework_patcher/nframework_patch.py"
+  python3 "${WORKSPACE}/framework_patcher/nservices_patch.py"
+  python3 "${WORKSPACE}/framework_patcher/miui-service_Patch.py"
+  python3 "${WORKSPACE}/framework_patcher/miui-framework_patch.py"
 fi
 
 # compile framework files
