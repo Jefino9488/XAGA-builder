@@ -216,9 +216,9 @@ echo -e "${BLUE}- created miui_framework jar files"
 
 # move framework files
 echo -e "${YELLOW}- moving framework files"
-sudo mv -t "${WORKSPACE}/${DEVICE}/images/system_ext/framework/" "${WORKSPACE}/Builder/framework_patcher/framework.jar"
-sudo mv -t "${WORKSPACE}/${DEVICE}/images/system_ext/framework/" "${WORKSPACE}/Builder/framework_patcher/services.jar"
-sudo mv -t "${WORKSPACE}/${DEVICE}/images/system/framework/" "${WORKSPACE}/Builder/framework_patcher/miui_services.jar"
-sudo mv -t "${WORKSPACE}/${DEVICE}/images/system/framework/" "${WORKSPACE}/Builder/framework_patcher/miui_framework.jar"
+sudo mv -t "${WORKSPACE}/${DEVICE}/images/system/system/framework/" "${WORKSPACE}/Builder/framework_patcher/framework.jar"
+sudo mv -t "${WORKSPACE}/${DEVICE}/images/system/system/framework/" "${WORKSPACE}/Builder/framework_patcher/services.jar"
+sudo mv -t "${WORKSPACE}/${DEVICE}/images/system_ext/framework/" "${WORKSPACE}/Builder/framework_patcher/miui_services.jar"
+sudo mv -t "${WORKSPACE}/${DEVICE}/images/system_ext/framework/" "${WORKSPACE}/Builder/framework_patcher/miui_framework.jar"
 echo -e "${BLUE}- moved framework files"
 echo -e "${GREEN}- All done!"
