@@ -35,8 +35,8 @@ else
     echo "Download failed"
 fi
 
-mkdir -p "${WORKSPACE}/${DEVICE}/images/product/app/Gboard"
-mv "${WORKSPACE}/Builder/apps/goboard.apk" "${WORKSPACE}/${DEVICE}/images/product/priv-app/Gboard"
+mkdir -p "${WORKSPACE}/${DEVICE}/images/product/priv-app/Gboard"
+mv "${WORKSPACE}/Builder/apps/goboard.apk" "${WORKSPACE}/${DEVICE}/images/product/priv-app/Gboard/"
 mv "${WORKSPACE}/Builder/permisions/privapp_whitelist_com.google.android.inputmethod.latin.xml" "${WORKSPACE}/${DEVICE}/images/product/etc/permissions/"
 ls -alh "${WORKSPACE}/${DEVICE}/images/product/data-app/"
 ls -alh "${WORKSPACE}/${DEVICE}/images/product/app/"
