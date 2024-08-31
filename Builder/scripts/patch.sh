@@ -120,27 +120,27 @@ fi
 
 # compile framework files
 echo -e "${YELLOW}- compiling framework dex files"
-if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes ]; then
+if [ -d ${WORKSPACE}/Builder/framework_patcher/classes ]; then
   java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/classes -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes.dex
 else
   echo -e "${RED}- classes not found in framework"
 fi
-if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes2 ]; then
+if [ -d ${WORKSPACE}/Builder/framework_patcher/classes2 ]; then
   java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/classes2 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes2.dex
 else
   echo -e "${RED}- classes2 not found in framework"
 fi
-if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes3 ]; then
+if [ -d ${WORKSPACE}/Builder/framework_patcher/classes3 ]; then
   java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/classes3 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes3.dex
 else
   echo -e "${RED}- classes3 not found in framework"
 fi
-if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes4 ]; then
+if [ -d ${WORKSPACE}/Builder/framework_patcher/classes4 ]; then
   java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/classes4 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes4.dex
 else
   echo -e "${RED}- classes4 not found in framework"
 fi
-if [ -d ${WORKSPACE}/Builder/framework_patcher/framework/classes5 ]; then
+if [ -d ${WORKSPACE}/Builder/framework_patcher/classes5 ]; then
   java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/classes5 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/framework/classes5.dex
 else
   echo -e "${RED}- classes5 not found in framework"
@@ -159,17 +159,17 @@ if [ -d ${WORKSPACE}/Builder/framework_patcher/services_classes2 ]; then
 else
   echo -e "${RED}- classes2 not found in services"
 fi
-if [ -d ${WORKSPACE}/Builder/framework_patcher/services/services_classes3 ]; then
+if [ -d ${WORKSPACE}/Builder/framework_patcher/services_classes3 ]; then
   java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services_classes3 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes3.dex
 else
   echo -e "${RED}- classes3 not found in services"
 fi
-if [ -d ${WORKSPACE}/Builder/framework_patcher/services/services_classes4 ]; then
+if [ -d ${WORKSPACE}/Builder/framework_patcher/services_classes4 ]; then
   java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services_classes4 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes4.dex
 else
   echo -e "${RED}- classes4 not found in services"
 fi
-if [ -d ${WORKSPACE}/Builder/framework_patcher/services/services_classes5 ]; then
+if [ -d ${WORKSPACE}/Builder/framework_patcher/services_classes5 ]; then
   java -jar "$SMALI" a ${WORKSPACE}/Builder/framework_patcher/services_classes5 -a 34 -o ${WORKSPACE}/Builder/framework_patcher/services/classes5.dex
 else
   echo -e "${RED}- classes5 not found in services"
