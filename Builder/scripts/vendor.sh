@@ -9,7 +9,7 @@ GREEN='\033[1;32m'
 echo -e "${YELLOW}- modifying Vendor"
 
 unwanted_files=("voicecommand" "IFAAService" "MipayService" "SoterService" "TimeService")
-dirs=("/images/vendor/etc/" "/images/vendor/apps/")
+dirs=("images/vendor/etc" "images/vendor/app")
 
 for dir in "${dirs[@]}"; do
   for file in "${unwanted_files[@]}"; do
@@ -22,6 +22,6 @@ for dir in "${dirs[@]}"; do
 done
 
 ls -alh "${WORKSPACE}/${DEVICE}/images/vendor/etc/"
-ls -alh "${WORKSPACE}/${DEVICE}/images/vendor/apps/"
+ls -alh "${WORKSPACE}/${DEVICE}/images/vendor/app/"
 
 echo -e "${BLUE}- modified vendor"
