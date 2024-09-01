@@ -226,15 +226,15 @@ def modify_smali_files(directories):
         package_parser_signing_details = os.path.join(directory,
                                                       'android/content/pm/PackageParser$SigningDetails.smali')
         apk_signature_verifier = os.path.join(directory, 'android/util/apk/ApkSignatureVerifier.smali')
-        apk_signature_scheme_v2_verifier = os.path.join(directory,
-                                                        'android/util/apk/ApkSignatureSchemeV2Verifier.smali')
-        apk_signature_scheme_v3_verifier = os.path.join(directory,
-                                                        'android/util/apk/ApkSignatureSchemeV3Verifier.smali')
-        apk_signing_block_utils = os.path.join(directory, 'android/util/apk/ApkSigningBlockUtils.smali')
-        package_parser = os.path.join(directory, 'android/content/pm/PackageParser.smali')
-        package_parser_exception = os.path.join(directory,
-                                                'android/content/pm/PackageParser$PackageParserException.smali')
-        strict_jar_verifier = os.path.join(directory, 'android/util/jar/StrictJarVerifier.smali')
+        # apk_signature_scheme_v2_verifier = os.path.join(directory,
+        #                                                 'android/util/apk/ApkSignatureSchemeV2Verifier.smali')
+        # apk_signature_scheme_v3_verifier = os.path.join(directory,
+        #                                                 'android/util/apk/ApkSignatureSchemeV3Verifier.smali')
+        # apk_signing_block_utils = os.path.join(directory, 'android/util/apk/ApkSigningBlockUtils.smali')
+        # package_parser = os.path.join(directory, 'android/content/pm/PackageParser.smali')
+        # package_parser_exception = os.path.join(directory,
+        #                                         'android/content/pm/PackageParser$PackageParserException.smali')
+        # strict_jar_verifier = os.path.join(directory, 'android/util/jar/StrictJarVerifier.smali')
 
         if os.path.exists(signing_details):
             logging.info(f"Found file: {signing_details}")
@@ -252,36 +252,36 @@ def modify_smali_files(directories):
             modify_file(apk_signature_verifier)
         else:
             logging.warning(f"File not found: {apk_signature_verifier}")
-        if os.path.exists(apk_signature_scheme_v2_verifier):
-            logging.info(f"Found file: {apk_signature_scheme_v2_verifier}")
-            modify_apk_signature_scheme_v2_verifier(apk_signature_scheme_v2_verifier)
-        else:
-            logging.warning(f"File not found: {apk_signature_scheme_v2_verifier}")
-        if os.path.exists(apk_signature_scheme_v3_verifier):
-            logging.info(f"Found file: {apk_signature_scheme_v3_verifier}")
-            modify_apk_signature_scheme_v3_verifier(apk_signature_scheme_v3_verifier)
-        else:
-            logging.warning(f"File not found: {apk_signature_scheme_v3_verifier}")
-        if os.path.exists(apk_signing_block_utils):
-            logging.info(f"Found file: {apk_signing_block_utils}")
-            modify_apk_signing_block_utils(apk_signing_block_utils)
-        else:
-            logging.warning(f"File not found: {apk_signing_block_utils}")
-        if os.path.exists(package_parser):
-            logging.info(f"Found file: {package_parser}")
-            modify_package_parser(package_parser)
-        else:
-            logging.warning(f"File not found: {package_parser}")
-        if os.path.exists(package_parser_exception):
-            logging.info(f"Found file: {package_parser_exception}")
-            modify_exception_file(package_parser_exception)
-        else:
-            logging.warning(f"File not found: {package_parser_exception}")
-        if os.path.exists(strict_jar_verifier):
-            logging.info(f"Found file: {strict_jar_verifier}")
-            modify_strict_jar_verifier(strict_jar_verifier)
-        else:
-            logging.warning(f"File not found: {strict_jar_verifier}")
+        # if os.path.exists(apk_signature_scheme_v2_verifier):
+        #     logging.info(f"Found file: {apk_signature_scheme_v2_verifier}")
+        #     modify_apk_signature_scheme_v2_verifier(apk_signature_scheme_v2_verifier)
+        # else:
+        #     logging.warning(f"File not found: {apk_signature_scheme_v2_verifier}")
+        # if os.path.exists(apk_signature_scheme_v3_verifier):
+        #     logging.info(f"Found file: {apk_signature_scheme_v3_verifier}")
+        #     modify_apk_signature_scheme_v3_verifier(apk_signature_scheme_v3_verifier)
+        # else:
+        #     logging.warning(f"File not found: {apk_signature_scheme_v3_verifier}")
+        # if os.path.exists(apk_signing_block_utils):
+        #     logging.info(f"Found file: {apk_signing_block_utils}")
+        #     modify_apk_signing_block_utils(apk_signing_block_utils)
+        # else:
+        #     logging.warning(f"File not found: {apk_signing_block_utils}")
+        # if os.path.exists(package_parser):
+        #     logging.info(f"Found file: {package_parser}")
+        #     modify_package_parser(package_parser)
+        # else:
+        #     logging.warning(f"File not found: {package_parser}")
+        # if os.path.exists(package_parser_exception):
+        #     logging.info(f"Found file: {package_parser_exception}")
+        #     modify_exception_file(package_parser_exception)
+        # else:
+        #     logging.warning(f"File not found: {package_parser_exception}")
+        # if os.path.exists(strict_jar_verifier):
+        #     logging.info(f"Found file: {strict_jar_verifier}")
+        #     modify_strict_jar_verifier(strict_jar_verifier)
+        # else:
+        #     logging.warning(f"File not found: {strict_jar_verifier}")
 
 
 if __name__ == "__main__":

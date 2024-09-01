@@ -193,8 +193,8 @@ def modify_smali_files(directories):
                                                      'com/android/server/pm/PackageManagerServiceUtils.smali')
         install_package_helper = os.path.join(directory, 'com/android/server/pm/InstallPackageHelper.smali')
         verification_params = os.path.join(directory, 'com/android/server/pm/VerificationParams.smali')
-        parsing_package_utils = os.path.join(directory, 'com/android/server/pm/pkg/parsing/ParsingPackageUtils.smali')
-        package_info_utils = os.path.join(directory, 'com/android/server/pm/InstallPackageHelper.smali')
+        # parsing_package_utils = os.path.join(directory, 'com/android/server/pm/pkg/parsing/ParsingPackageUtils.smali')
+        # package_info_utils = os.path.join(directory, 'com/android/server/pm/InstallPackageHelper.smali')
 
         if os.path.exists(package_manager_service_utils):
             logging.info(f"Found file: {package_manager_service_utils}")
@@ -214,16 +214,16 @@ def modify_smali_files(directories):
         else:
             logging.warning(f"File not found: {verification_params}")
 
-        if os.path.exists(parsing_package_utils):
-            logging.info(f"Found file: {parsing_package_utils}")
-            modify_parsing_package_utils(parsing_package_utils)
-        else:
-            logging.warning(f"File not found: {parsing_package_utils}")
-        if os.path.exists(package_info_utils):
-            logging.info(f"Found file: {package_info_utils}")
-            modify_invoke_interface(package_info_utils)
-        else:
-            logging.warning(f"File not found: {package_info_utils}")
+        # if os.path.exists(parsing_package_utils):
+        #     logging.info(f"Found file: {parsing_package_utils}")
+        #     modify_parsing_package_utils(parsing_package_utils)
+        # else:
+        #     logging.warning(f"File not found: {parsing_package_utils}")
+        # if os.path.exists(package_info_utils):
+        #     logging.info(f"Found file: {package_info_utils}")
+        #     modify_invoke_interface(package_info_utils)
+        # else:
+        #     logging.warning(f"File not found: {package_info_utils}")
 
 
 if __name__ == "__main__":
