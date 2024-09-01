@@ -31,20 +31,8 @@ done
 
 # Add Gboard only if the region is CN
 if [ "$REGION" == "CN" ]; then
-  APK_URL="https://eb5e7388c3df147b74dd2379b7cf8323.r2.cloudflarestorage.com/downloadprod/wp-content/uploads/2024/08/18/66bc4c651cd8d/com.google.android.inputmethod.latin_14.5.04.655125648-release-arm64-v8a-149760070_minAPI26%28arm64-v8a%29%28nodpi%29_apkmirror.com.apk?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=72a5ba3a0b8a601e535d5525f12f8177%2F20240831%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20240831T044044Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Signature=7bd3772af46e20221ace8292edb560ce1e4c647cead60e11256b105d76e99798"
-  DEST_DIR="${WORKSPACE}/Builder/apps"
-  DEST_FILE="goboard.apk"
-
-  mkdir -p "$DEST_DIR"
-  aria2c -x16 -d "$DEST_DIR" -o "$DEST_FILE" "$APK_URL"
-  if [ -f "$DEST_DIR/$DEST_FILE" ]; then
-      echo "Download successful: $DEST_DIR/$DEST_FILE"
-  else
-      echo "Download failed"
-  fi
-
   mkdir -p "${WORKSPACE}/${DEVICE}/images/product/priv-app/Gboard"
-  mv "${WORKSPACE}/Builder/apps/goboard.apk" "${WORKSPACE}/${DEVICE}/images/product/priv-app/Gboard/"
+  mv "${WORKSPACE}/Builder/apps/gboard.apk" "${WORKSPACE}/${DEVICE}/images/product/priv-app/Gboard/"
   mv "${WORKSPACE}/Builder/permisions/privapp_whitelist_com.google.android.inputmethod.latin.xml" "${WORKSPACE}/${DEVICE}/images/product/etc/permissions/"
   echo -e "${GREEN}Gboard added"
 fi
