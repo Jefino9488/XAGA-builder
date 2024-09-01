@@ -206,19 +206,19 @@ echo -e "${BLUE}- created services jar files"
 
 # create miui_services files
 echo -e "${YELLOW}- creating miui_services jar files"
-7z a -tzip "${WORKSPACE}/Builder/framework_patcher/miui_services.jar" "${WORKSPACE}/Builder/framework_patcher/miui_services/classes.dex"
+7z a -tzip "${WORKSPACE}/Builder/framework_patcher/miui-services.jar" "${WORKSPACE}/Builder/framework_patcher/miui_services/classes.dex"
 echo -e "${BLUE}- created miui_services jar files"
 
 # create miui_framework files
 echo -e "${YELLOW}- creating miui_framework jar files"
-7z a -tzip "${WORKSPACE}/Builder/framework_patcher/miui_framework.jar" "${WORKSPACE}/Builder/framework_patcher/miui_framework/classes.dex"
+7z a -tzip "${WORKSPACE}/Builder/framework_patcher/miui-framework.jar" "${WORKSPACE}/Builder/framework_patcher/miui_framework/classes.dex"
 echo -e "${BLUE}- created miui_framework jar files"
 
 # move framework files
 echo -e "${YELLOW}- moving framework files"
 sudo mv -t "${WORKSPACE}/${DEVICE}/images/system/system/framework/" "${WORKSPACE}/Builder/framework_patcher/framework.jar"
 sudo mv -t "${WORKSPACE}/${DEVICE}/images/system/system/framework/" "${WORKSPACE}/Builder/framework_patcher/services.jar"
-sudo mv -t "${WORKSPACE}/${DEVICE}/images/system_ext/framework/" "${WORKSPACE}/Builder/framework_patcher/miui_services.jar"
-sudo mv -t "${WORKSPACE}/${DEVICE}/images/system_ext/framework/" "${WORKSPACE}/Builder/framework_patcher/miui_framework.jar"
+sudo mv -t "${WORKSPACE}/${DEVICE}/images/system_ext/framework/" "${WORKSPACE}/Builder/framework_patcher/miui-services.jar"
+sudo mv -t "${WORKSPACE}/${DEVICE}/images/system_ext/framework/" "${WORKSPACE}/Builder/framework_patcher/miui-framework.jar"
 echo -e "${BLUE}- moved framework files"
 echo -e "${GREEN}- All done!"
