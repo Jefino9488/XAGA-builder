@@ -112,10 +112,10 @@ if [ "$FRAMEWORK" == "core_patch" ]; then
   python3 miui-service_Patch.py
   python3 miui-framework_patch.py
 else
-  python3 "${WORKSPACE}/Builder/framework_patcher/nframework_patch.py"
-  python3 "${WORKSPACE}/Builder/framework_patcher/nservices_patch.py"
-  python3 "${WORKSPACE}/Builder/framework_patcher/miui-service_Patch.py"
-  python3 "${WORKSPACE}/Builder/framework_patcher/miui-framework_patch.py"
+  python3 nframework_patch.py
+  python3 nservices_patch.py
+  python3 miui-service_Patch.py
+  python3 miui-framework_patch.py
 fi
 
 # compile framework files
