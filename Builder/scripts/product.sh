@@ -39,6 +39,9 @@ if [ "$REGION" == "CN" ]; then
   mkdir -p "${WORKSPACE}/${DEVICE}/images/product/priv-app/GooglePlayStore"
   mv "${WORKSPACE}/Builder/apps/playstore.apk" "${WORKSPACE}/${DEVICE}/images/product/priv-app/GooglePlayStore/"
   echo -e "${GREEN}Playstore added"
+  # add modifed launcher
+  mv "${WORKSPACE}/Builder/apps/MiuiHome.apk" "${WORKSPACE}/${DEVICE}/images/product/priv-app/MiuiHome/"
+  echo -e "${GREEN}MiuiHome added"
 fi
 
 ls -alh "${WORKSPACE}/${DEVICE}/images/product/data-app/"
