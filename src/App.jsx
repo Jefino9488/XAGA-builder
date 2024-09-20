@@ -70,7 +70,6 @@ const App = () => {
       <h1 id="h">Build ROM</h1>
       <br/>
       <form ref={formRef} onSubmit={handleSubmit}>
-
         <label htmlFor="build-type-select">Select Build Type:</label>
         <select id="build-type-select" value={buildType} onChange={(e) => setBuildType(e.target.value)} required>
           <option value="fastboot">Fastboot</option>
