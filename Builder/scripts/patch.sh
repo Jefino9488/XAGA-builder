@@ -1,6 +1,6 @@
 DEVICE="$1"
 WORKSPACE="$2"
-FRAMEWORK="$3"
+CORE="$3"
 
 chmod +r "$WORKSPACE"/Builder/framework_patcher/*.py
 
@@ -106,8 +106,9 @@ echo -e "${BLUE}- decompiled miui_framework dex files"
 echo -e "${YELLOW}- patching framework files"
 cd "${WORKSPACE}/Builder/framework_patcher/" || exit
 ls
-if [ "$FRAMEWORK" == "core_patch" ]; then
-  python3 framework_patch.py
+python3 framework_patch.py "$CORE"
+if [ "$CORE" == "true" ]; then
+
   python3 services_patch.py
   python3 miui-service_Patch.py
   python3 miui-framework_patch.py

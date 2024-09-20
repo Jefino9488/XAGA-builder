@@ -14,14 +14,14 @@ on:
         options:
           - 'CN'
           - 'Global'
-      framework:
-        description: 'Select framework patch'
+      core:
+        description: 'Apply core patch'
         required: true
         type: choice
         options:
-          - 'patch'
-          - 'core_patch'
-
+          - 'true'
+          - 'false'
+        default: 'false'
 
 jobs:
   build:
@@ -91,7 +91,7 @@ jobs:
 
       - name: Patch Framework
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/patch.sh ${{ env.device }} $GITHUB_WORKSPACE ${{ github.event.inputs.framework }}
+          sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/patch.sh ${{ env.device }} $GITHUB_WORKSPACE ${{ github.event.inputs.core }}
 
       - name: Patch Boot
         run: |
