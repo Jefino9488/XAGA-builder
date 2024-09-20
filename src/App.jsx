@@ -34,7 +34,7 @@ const App = () => {
         owner: REPO_OWNER,
         repo: REPO_NAME,
         workflow_id: workflow_id,
-        ref: buildType === 'hypermod' ? 'hypermod' : 'fastboot',
+        ref: 'builder',
         inputs: inputs
       });
 
@@ -68,7 +68,7 @@ const App = () => {
   return (
     <div id="root">
       <h1 id="h">Build ROM</h1>
-      <br/>
+      <br />
       <form ref={formRef} onSubmit={handleSubmit}>
         <label htmlFor="build-type-select">Select Build Type:</label>
         <select id="build-type-select" value={buildType} onChange={(e) => setBuildType(e.target.value)} required>
@@ -91,8 +91,7 @@ const App = () => {
 
             <h2>Output Settings</h2>
             <label htmlFor="name-input">Output name for the zip ({romType === 'AOSP' ? 'required' : 'optional'}):</label>
-            <input type="name" id="name-input" value={name} onChange={(e) => setName(e.target.value)}
-                   required={romType === 'AOSP'} />
+            <input type="name" id="name-input" value={name} onChange={(e) => setName(e.target.value)} required={romType === 'AOSP'} />
           </>
         )}
 
