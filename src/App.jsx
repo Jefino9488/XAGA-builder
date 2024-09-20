@@ -15,50 +15,39 @@ const App = () => {
   const REPO_OWNER = 'Jefino9488';
   const REPO_NAME = 'XAGA-builder';
   const FASTBOOT_WORKFLOW_ID = 'FASTBOOT.yml';
-  const HYPER_BUILDER = 'deploy.yml';
+  const HYPER_BUILDER = 'Hyper_Builder.yml';
 
   const octokit = new Octokit({
     auth: GITHUB_TOKEN
   });
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  let workflow_id = buildType === 'hypermod' ? HYPER_BUILDER : FASTBOOT_WORKFLOW_ID;
-  let inputs = buildType === 'hypermod'
-    ? {
-        URL: url,
-        region: region, // Matches the input name in your YAML
-        core: corePatch // Matches the input name in your YAML
+    let workflow_id = buildType === 'hypermod' ? HYPER_BUILDER : FASTBOOT_WORKFLOW_ID;
+    let inputs = buildType === 'hypermod'
+      ? { URL: url, region, core: corePatch }
+      : { URL: url, ROM_TYPE: romType, Name: name };
+
+    try {
+      const response = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
+        workflow_id: workflow_id,
+        ref: 'builder',
+        inputs: inputs
+      });
+
+      if (response.status === 204) {
+        window.alert(`Build started for ${buildType.toUpperCase()}! Wait for 10 - 15 minutes and check the releases page.`);
+        resetForm();
+      } else {
+        console.error('Error triggering GitHub Action:', response.status);
       }
-    : {
-        URL: url,
-        ROM_TYPE: romType,
-        Name: name
-      };
-
-  console.log('Inputs being sent:', inputs); // Log the inputs being sent to GitHub
-
-  try {
-    const response = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      workflow_id: workflow_id,
-      ref: 'builder', // Ensure this is the correct branch
-      inputs: inputs
-    });
-
-    if (response.status === 204) {
-      window.alert(`Build started for ${buildType.toUpperCase()}! Wait for 10 - 15 minutes and check the releases page.`);
-      resetForm();
-    } else {
-      console.error('Error triggering GitHub Action:', response.status);
+    } catch (error) {
+      console.error('Error triggering GitHub Action:', error);
     }
-  } catch (error) {
-    console.error('Error triggering GitHub Action:', error);
-  }
-};
-
+  };
 
   const resetForm = () => {
     setUrl('');
