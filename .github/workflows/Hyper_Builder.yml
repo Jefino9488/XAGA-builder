@@ -54,6 +54,7 @@ jobs:
           # Extract device name from the URL
           URL="${{ github.event.inputs.URL }}"
           device_name=$(basename "$URL" | cut -d'_' -f2 | cut -d'.' -f2)
+          echo "version=$(echo ${{ github.event.inputs.URL }} | cut -d'/' -f4)" >> $GITHUB_ENV
           echo "device=$device_name" >> $GITHUB_ENV
           echo "Device name: $device_name"
 
@@ -101,6 +102,12 @@ jobs:
         run: |
           sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/repack.sh ${{ env.device }} $GITHUB_WORKSPACE
 
+      - name: release
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
+          cp "${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/"
+          cd "$GITHUB_WORKSPACE/GithubRelease"
+
       - name: Upload ROM
         id: Fastboot-Upload
         uses: actions/upload-artifact@v4
@@ -109,3 +116,13 @@ jobs:
           path: ${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip
           compression-level: 0
           retention-days: 1
+
+      - name: Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ${{ github.workspace }}/GithubRelease/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ env.device }}_fastboot
+          tag: ${{ env.version }}
+          allowUpdates: true
+          makeLatest: true
