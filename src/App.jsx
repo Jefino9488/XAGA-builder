@@ -15,7 +15,7 @@ const App = () => {
   const REPO_OWNER = 'Jefino9488';
   const REPO_NAME = 'XAGA-builder';
   const FASTBOOT_WORKFLOW_ID = 'FASTBOOT.yml';
-  const HYPER_BUILDER = 'Hyper_Builder.yml';
+  const HYPER_BUILDER = '';
 
   const octokit = new Octokit({
     auth: GITHUB_TOKEN
