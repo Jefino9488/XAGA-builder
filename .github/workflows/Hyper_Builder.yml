@@ -102,10 +102,13 @@ jobs:
         run: |
           sudo bash "$GITHUB_WORKSPACE"/Builder/scripts/repack.sh ${{ env.device }} $GITHUB_WORKSPACE
 
-      - name: release
+      - name: release split
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
           cp "${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/"
+          cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
+          split -b 1536M "$GITHUB_WORKSPACE/GithubRelease/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/${{ env.device }}_fastboot.zip.part-"
+          ls "$GITHUB_WORKSPACE/GithubRelease"
           cd "$GITHUB_WORKSPACE/GithubRelease"
 
       - name: Upload ROM
