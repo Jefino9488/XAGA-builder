@@ -105,9 +105,8 @@ jobs:
       - name: release split
         run: |
           mkdir -p "$GITHUB_WORKSPACE/GithubRelease"
-          cp "${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/"
           cp "$GITHUB_WORKSPACE/tools/merge.bat" "$GITHUB_WORKSPACE/GithubRelease/"
-          split -b 1536M "$GITHUB_WORKSPACE/GithubRelease/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/${{ env.device }}_fastboot.zip.part-"
+          split -b 1536M "${{ github.workspace }}/zip/${{ env.device }}_fastboot.zip" "$GITHUB_WORKSPACE/GithubRelease/${{ env.device }}_fastboot-split.zip"
           ls "$GITHUB_WORKSPACE/GithubRelease"
           cd "$GITHUB_WORKSPACE/GithubRelease"
 
