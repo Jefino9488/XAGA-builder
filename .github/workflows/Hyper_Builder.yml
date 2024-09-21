@@ -124,7 +124,7 @@ jobs:
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ env.device }}_fastboot
+          name: ${{ env.device }}_HyperMod
           tag: ${{ env.version }}
           allowUpdates: true
           makeLatest: true
