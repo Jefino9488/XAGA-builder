@@ -1,0 +1,53 @@
+name: Merge and Upload to Pixeldrain
+
+on:
+  workflow_dispatch:
+    inputs:
+      img_zip_url:
+        description: "Direct download URL of ZIP containing .img files"
+        required: true
+      base_zip_url:
+        description: "Direct download URL of base ZIP (contains /images)"
+        required: true
+      output_name:
+        description: "Final output ZIP name (without .zip)"
+        required: true
+        default: "merged_output"
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip zip curl
+
+      - name: Download ZIP files
+        run: |
+          mkdir downloads
+          curl -L "${{ github.event.inputs.img_zip_url }}" -o downloads/imgs.zip
+          curl -L "${{ github.event.inputs.base_zip_url }}" -o downloads/base.zip
+
+      - name: Extract ZIPs
+        run: |
+          mkdir -p work/imgs work/base
+          unzip downloads/imgs.zip -d work/imgs
+          unzip downloads/base.zip -d work/base
+
+      - name: Replace images folder (force overwrite)
+        run: |
+          mkdir -p work/base/images
+          cp -rf work/imgs/*.img work/base/images/
+
+      - name: Repack merged ZIP
+        run: |
+          cd work/base
+          zip -r ../../${{ github.event.inputs.output_name }}.zip . -x "*.DS_Store"
+
+      - name: Upload to Pixeldrain
+        run: |
+          curl -T "${{ github.event.inputs.output_name }}.zip" \
+            -u :${{ secrets.PIXELDRAIN_API_KEY }} \
+            https://pixeldrain.com/api/file/
