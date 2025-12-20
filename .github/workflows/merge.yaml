@@ -1,16 +1,16 @@
-name: Merge and Upload to Pixeldrain
+name: Merge and Upload (gdown + Pixeldrain)
 
 on:
   workflow_dispatch:
     inputs:
-      img_zip_url:
-        description: "Direct download URL of ZIP containing .img files"
+      img_zip_id:
+        description: "Google Drive FILE ID of ZIP containing .img files"
         required: true
-      base_zip_url:
-        description: "Direct download URL of base ZIP (contains /images)"
+      base_zip_id:
+        description: "Google Drive FILE ID of base ZIP"
         required: true
       output_name:
-        description: "Final output ZIP name (without .zip)"
+        description: "Final ZIP name (without .zip)"
         required: true
         default: "merged_output"
 
@@ -19,32 +19,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip zip curl
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
-      - name: Download ZIP files
+      - name: Install dependencies
         run: |
-          mkdir downloads
-          curl -L "${{ github.event.inputs.img_zip_url }}" -o downloads/imgs.zip
-          curl -L "${{ github.event.inputs.base_zip_url }}" -o downloads/base.zip
+          pip install --no-cache-dir gdown
+
+      - name: Create directories
+        run: |
+          mkdir -p downloads work/imgs work/base
+
+      - name: Download ZIPs from Google Drive (gdown)
+        run: |
+          gdown --id "${{ github.event.inputs.img_zip_id }}"  -O downloads/imgs.zip
+          gdown --id "${{ github.event.inputs.base_zip_id }}" -O downloads/base.zip
+
+      - name: Verify ZIP files (fail fast)
+        run: |
+          ls -lh downloads
+          unzip -t downloads/imgs.zip
+          unzip -t downloads/base.zip
 
       - name: Extract ZIPs
         run: |
-          mkdir -p work/imgs work/base
           unzip downloads/imgs.zip -d work/imgs
           unzip downloads/base.zip -d work/base
 
-      - name: Replace images folder (force overwrite)
+      - name: Replace /images folder with .img files
         run: |
           mkdir -p work/base/images
-          cp -rf work/imgs/*.img work/base/images/
+          cp -vf work/imgs/*.img work/base/images/
 
       - name: Repack merged ZIP
         run: |
           cd work/base
-          zip -r ../../${{ github.event.inputs.output_name }}.zip . -x "*.DS_Store"
+          zip -r "../../${{ github.event.inputs.output_name }}.zip" .
 
       - name: Upload to Pixeldrain
         run: |
