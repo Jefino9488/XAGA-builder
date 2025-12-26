@@ -9,6 +9,7 @@ on:
       base_zip_url:
         description: "URL of base ZIP (Google Drive or direct link)"
         required: true
+        default: "https://drive.google.com/uc?id=1BtSfDXx9YGypMlBCU3FaZNFp-EyNkwWa&confirm=t&uuid=bd6fe193-294a-4550-886b-8e0fa3b4d977"
       output_name:
         description: "Final ZIP name (without .zip)"
         required: true
