@@ -18,6 +18,8 @@ on:
 jobs:
   merge:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to create the Release
 
     steps:
       - name: Set up Python
@@ -28,14 +30,14 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip zip
+          sudo apt-get install -y wget unzip zip jq
           pip install --no-cache-dir gdown
 
       - name: Create directories
         run: |
           mkdir -p downloads work/imgs work/base
 
-      - name: Download ZIPs (Smart handler: gdown + wget)
+      - name: Download ZIPs (Smart handler)
         shell: bash
         run: |
           set -e
@@ -45,6 +47,7 @@ jobs:
             output="$2"
             echo "Downloading $output from $url"
 
+            # Check if URL contains drive.google.com
             if echo "$url" | grep -q "drive.google.com"; then
               echo "Detected Google Drive link, using gdown..."
               gdown --fuzzy -O "$output" "$url"
@@ -54,10 +57,10 @@ jobs:
             fi
           }
 
-          download_file "${{ github.event.inputs.img_zip_url }}"  downloads/imgs.zip
+          download_file "${{ github.event.inputs.img_zip_url }}" downloads/imgs.zip
           download_file "${{ github.event.inputs.base_zip_url }}" downloads/base.zip
 
-      - name: Verify ZIP files (fail fast)
+      - name: Verify ZIP files
         run: |
           ls -lh downloads
           unzip -t downloads/imgs.zip
@@ -78,8 +81,41 @@ jobs:
           cd work/base
           zip -r "../../${{ github.event.inputs.output_name }}.zip" .
 
-      - name: Upload to Pixeldrain
+      - name: Upload to Pixeldrain & Generate MD
+        id: upload
         run: |
-          curl -T "${{ github.event.inputs.output_name }}.zip" \
-            -u :${{ secrets.PIXELDRAIN_API_KEY }} \
-            https://pixeldrain.com/api/file/
+          echo "Uploading to Pixeldrain..."
+          
+          # Upload and capture JSON response
+          RESPONSE=$(curl -s -T "${{ github.event.inputs.output_name }}.zip" -u :${{ secrets.PIXELDRAIN_API_KEY }} https://pixeldrain.com/api/file/)
+          
+          echo "Response: $RESPONSE"
+          
+          # Parse the ID using jq
+          FILE_ID=$(echo "$RESPONSE" | jq -r .id)
+          
+          if [ "$FILE_ID" == "null" ] || [ -z "$FILE_ID" ]; then
+            echo "::error::Upload failed. No ID returned."
+            exit 1
+          fi
+
+          LINK="https://pixeldrain.com/u/$FILE_ID"
+          echo "Generated Link: $LINK"
+          
+          # Create Markdown file
+          echo "# Build Successful" > download_link.md
+          echo "The merged file **${{ github.event.inputs.output_name }}.zip** is ready." >> download_link.md
+          echo "" >> download_link.md
+          echo "## [Download from Pixeldrain]($LINK)" >> download_link.md
+          echo "" >> download_link.md
+          echo "\`$LINK\`" >> download_link.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: "Build ${{ github.run_number }}: ${{ github.event.inputs.output_name }}"
+          body_path: download_link.md
+          files: download_link.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
