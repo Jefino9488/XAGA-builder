@@ -1,13 +1,13 @@
-name: Merge and Upload (gdown + Pixeldrain)
+name: Merge and Upload (Smart Download + Pixeldrain)
 
 on:
   workflow_dispatch:
     inputs:
-      img_zip_id:
-        description: "Google Drive FILE ID of ZIP containing .img files"
+      img_zip_url:
+        description: "URL of ZIP containing .img files (Google Drive or direct link)"
         required: true
-      base_zip_id:
-        description: "Google Drive FILE ID of base ZIP"
+      base_zip_url:
+        description: "URL of base ZIP (Google Drive or direct link)"
         required: true
       output_name:
         description: "Final ZIP name (without .zip)"
@@ -26,16 +26,35 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip zip
           pip install --no-cache-dir gdown
 
       - name: Create directories
         run: |
           mkdir -p downloads work/imgs work/base
 
-      - name: Download ZIPs from Google Drive (gdown)
+      - name: Download ZIPs (Smart handler: gdown + wget)
+        shell: bash
         run: |
-          gdown --id "${{ github.event.inputs.img_zip_id }}"  -O downloads/imgs.zip
-          gdown --id "${{ github.event.inputs.base_zip_id }}" -O downloads/base.zip
+          set -e
+
+          download_file() {
+            url="$1"
+            output="$2"
+            echo "Downloading $output from $url"
+
+            if echo "$url" | grep -q "drive.google.com"; then
+              echo "Detected Google Drive link, using gdown..."
+              gdown --fuzzy -O "$output" "$url"
+            else
+              echo "Using wget for download..."
+              wget -O "$output" "$url"
+            fi
+          }
+
+          download_file "${{ github.event.inputs.img_zip_url }}"  downloads/imgs.zip
+          download_file "${{ github.event.inputs.base_zip_url }}" downloads/base.zip
 
       - name: Verify ZIP files (fail fast)
         run: |
